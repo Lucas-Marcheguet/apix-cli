@@ -1,7 +1,7 @@
-import click
-import getpass
 import logging
 import os
+
+import click
 
 import apixdev.config as cfg
 
@@ -14,12 +14,11 @@ if not os.path.isdir(path):
 logging.basicConfig(filename=filename, level=cfg.LOGGING_LEVEL)
 
 
-from apixdev.apix import apix
-from apixdev.cli.project import project
-from apixdev.cli.projects import projects
-from apixdev.cli.config import config
-from apixdev.cli.scaffold import scaffold
-
+from apixdev.apix import apix  # noqa: E402
+from apixdev.cli.config import config  # noqa: E402
+from apixdev.cli.project import project  # noqa: E402
+from apixdev.cli.projects import projects  # noqa: E402
+from apixdev.cli.scaffold import scaffold  # noqa: E402
 
 if not apix.is_ready:
     click.echo("Please fill configuration to continue :")
@@ -28,9 +27,7 @@ if not apix.is_ready:
 
 @click.group()
 def cli():
-
     """Apix Developper Toolkit, a powerfull command line tool."""
-    
 
 
 cli.add_command(project)

@@ -26,7 +26,7 @@ Build distribution
 ```
 python setup.py sdist
 ```
-or 
+or
 ```
 python3 -m build
 ```
