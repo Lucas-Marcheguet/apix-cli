@@ -1,36 +1,38 @@
-# import click
+import click
 
-# from apixdev.apix import apix
-# from apixdev.cli import tools
+from apixdev.cli.tools import print_dict
+from apixdev.core.settings import Settings
 
-
-# @click.group()
-# def config():
-#     """View and edit configuration"""
+settings = Settings()
 
 
-# @click.command()
-# def view():
-#     """Resume configuration"""
-
-#     vals = apix.config.get_vars()
-#     tools.print_dict(vals, False)
+@click.group()
+def config():
+    """View and edit configuration"""
 
 
-# @click.command()
-# @click.argument("key")
-# @click.argument("value")
-# def set(key, value):
-#     """Set a value"""
-#     apix.config.set_vars({key: value})
+@click.command()
+def view():
+    """Resume configuration"""
+
+    vals = settings.get_vars()
+    print_dict(vals, False)
 
 
-# @click.command()
-# def clear():
-#     """Clear all parameters"""
-#     raise NotImplementedError()
+@click.command()
+@click.argument("key")
+@click.argument("value")
+def set(key, value):
+    """Set a value"""
+    settings.set_vars({key: value})
 
 
-# config.add_command(view)
-# config.add_command(clear)
-# config.add_command(set)
+@click.command()
+def clear():
+    """Clear all parameters"""
+    raise NotImplementedError()
+
+
+config.add_command(view)
+config.add_command(clear)
+config.add_command(set)
