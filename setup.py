@@ -2,10 +2,10 @@ from setuptools import find_packages, setup
 
 setup(
     name="apixdev",
-    version="0.2.0",
-    description="Apix Developper Toolkit",
-    keywords="apix docker odoo development",
-    url="https://gitlab.apik.cloud/dev/apixdev",
+    version="0.2.1",
+    description="ApiX CLI",
+    keywords="docker odoo development",
+    url="https://github.com/apikcloud/apix-cli",
     author="Aurelien ROY",
     author_email="roy.aurelien@gmail.com",
     license="MIT",
@@ -14,7 +14,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         # Indicate who your project is intended for
         "Intended Audience :: Developers",
         "Environment :: Console",
