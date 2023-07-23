@@ -40,26 +40,17 @@ MANDATORY_VALUES = [
     "git.remote_url",
     "git.remote_login",
     "git.remote_token",
-    # "scaffold.odoo-template",
-    # "scaffold.docker-template",
     "docker.repository",
 ]
 IGNORED_VALUES = ["password"]
 BACKUP_URL = "{}/web/database/backup"
 RESTORE_URL = "{}/web/database/restore"
 LOCAL_URL = "http://localhost:8069"
-ODOORPC_OPTIONS = ["port"]
+ODOORPC_OPTIONS = [
+    "port",
+    "protocol",
+]
 
-COMPOSE_TEMPLATE_FILE = "docker-compose.yaml"
-
-COMPOSE_TEMPLATE_VALS = {
-    "services": {
-        "odoo": {
-            "image": "apik/odoo-saas:15.0-enterprise",
-            "environment": {"CUSTOM_REQUIREMENTS": []},
-        }
-    }
-}
 
 COMMANDS = {
     "start": {
