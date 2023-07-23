@@ -14,11 +14,9 @@ class Projects:
             settings = Settings()
             path = settings.workdir
         instance = cls(path)
-        return instance.search()
+        return instance.get_all()
 
-        return instance
-
-    def search(self):
+    def get_all(self):
         projects = list(map(Project, os.listdir(self.path)))
         projects = list(filter(lambda project: project.is_ready, projects))
 

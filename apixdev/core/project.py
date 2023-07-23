@@ -1,5 +1,6 @@
 import os
 import subprocess
+from shutil import rmtree
 
 import requests
 
@@ -103,8 +104,6 @@ class Project:
         compose = Compose.from_path(self.compose_file)
 
         requirements = get_requirements_from_path(self.repositories_path)
-        requirements += ["cryptography", "cryptography==2.6.0", "cryptography>3.0.0"]
-
         requirements += text_to_list(
             compose.extract("services/odoo/environment/CUSTOM_REQUIREMENTS")
         )
@@ -116,13 +115,28 @@ class Project:
         compose.save(self.compose_file)
 
     def load_manifest(self):
-        compose = Compose.from_path(self.manifest_file)
+        manifest = Compose.from_path(self.manifest_file)
+        self.uuid = manifest.extract("uuid")
+
+        print(self.uuid)
+
         keys = [
             (self.compose_file, "docker_compose_url"),
             (self.repositories_file, "repositories_url"),
         ]
 
         for filename, key in keys:
-            url = compose.extract(key)
-            print(url)
+            url = manifest.extract(key)
             self.download(filename, url, True)
+
+    # def __del__(self):
+    #     rmtree(self.path, ignore_errors=True)
+    #     self.root_path = None
+    #     self.path = None
+    #     self.name = None
+
+    def delete(self):
+        rmtree(self.path, ignore_errors=True)
+        self.root_path = None
+        self.path = None
+        self.name = None

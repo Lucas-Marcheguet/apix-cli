@@ -2,9 +2,8 @@ import logging
 
 import odoorpc
 
-import apixdev.vars as vars
 from apixdev.core.common import SingletonMeta
-from apixdev.core.settings import Settings
+from apixdev.core.settings import Settings, vars
 
 _logger = logging.getLogger(__name__)
 

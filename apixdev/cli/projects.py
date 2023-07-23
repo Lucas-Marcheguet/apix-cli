@@ -1,7 +1,6 @@
 import click
 
-from apixdev.cli.common import abort_if_false
-from apixdev.cli.tools import print_list
+from apixdev.cli.tools import abort_if_false, print_list
 from apixdev.core.projects import Projects
 
 

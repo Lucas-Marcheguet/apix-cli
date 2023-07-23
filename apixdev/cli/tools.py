@@ -21,3 +21,8 @@ def print_dict(vals, index=True):
 
 def dict_to_string(vals):
     return ", ".join(["{}: {}".format(k, v) for k, v in vals.items()])
+
+
+def abort_if_false(ctx, param, value):
+    if not value:
+        ctx.abort()

@@ -29,8 +29,9 @@ MANDATORY_VALUES = [
     "git.remote_url",
     "git.remote_login",
     "git.remote_token",
-    "scaffold.odoo-template",
-    "scaffold.docker-template",
+    # "scaffold.odoo-template",
+    # "scaffold.docker-template",
+    "docker.repository",
 ]
 IGNORED_VALUES = ["password"]
 BACKUP_URL = "{}/web/database/backup"
@@ -84,7 +85,6 @@ COMMANDS = {
             "_fg": True,
         },
     },
-    "cloc": {"args": [], "cmd": sh.cloc, "params": {"_tee": "out", "_out": sys.stdout}},
     "shell": {
         "args": ["exec", "-it", "bash", "-c"],
         "cmd": sh.docker,

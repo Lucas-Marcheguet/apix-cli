@@ -1,3 +1,4 @@
+import json
 import os
 
 import requirements as req_tool
@@ -15,6 +16,7 @@ def deduplicate(items):
 
 
 def get_requirements_from_path(path):
+    """Recursively extract all requirements from root path"""
     requirements = []
 
     for r, d, f in os.walk(path):
@@ -28,50 +30,27 @@ def get_requirements_from_path(path):
     return requirements
 
 
-def requirement_to_str(package):
-    # [('==', '3.4.8')]
-    res = ["".join([package.name, *item]) for item in package.specs]
-    return "".join(res) if res else package.name
-
-
-def specs_to_str(package):
-    # [('==', '3.4.8')]
-    return ["".join(specs) for specs in package.specs]
-
-
 def filter_requirements(items):
-    # parsed_requirements = []
-    # package_names = []
+    """Cleans and eliminates duplicate requirements"""
     requirements = "\n".join(deduplicate(items))
 
     reqs = {}
     res = []
 
     for item in req_tool.parse(requirements):
+        # Dict used to merge packages by name
         reqs.setdefault(item.name, [])
-
         reqs[item.name] += [SpecifierSet("".join(specs)) for specs in item.specs]
-        # print((item.name, item.specs))
 
     for name, specs in reqs.items():
         if not specs:
             res.append(name)
             continue
 
+        # Sort specifiers and keep only last one
+        # FIXME: Not perfect IMHO, errors possible, fix it !
         specs = sorted({*specs}, key=str)
-
         res.append("".join([name, str(specs[-1])]))
-
-        # specs_to_str(specs)
-
-    # res = [
-    #     Requirement(requirement_to_str(package))
-    #     for package in req_tool.parse(requirements)
-    # ]
-
-    # reqs = {*res}
-
-    # print([r.name for r in reqs])
 
     return res
 
@@ -102,3 +81,12 @@ def dict_merge(dct, merge_dct):
             dict_merge(dct[k], merge_dct[k])
         else:
             dct[k] = merge_dct[k]
+
+
+def bytes_to_json(data):
+    res = data.rstrip().decode("utf8").replace("'", '"').replace("\n", ",")
+    res = "[" + res + "]"
+    res = res.replace(",]", "]")
+    json_data = json.loads(res)
+
+    return json_data

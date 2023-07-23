@@ -31,16 +31,15 @@ setup(
     # python_requires='>=3.8',
     install_requires=[
         "click",
-        "gitdb",
-        "GitPython",
+        # "gitdb",
+        # "GitPython",
         "OdooRPC",
-        "python-gitlab",
         "PyYAML>=6.0",
         "requests",
         "sh",
-        "tqdm",
         "requirements-parser",
         "git-aggregator>=4.0.0",
+        "packaging",
     ],
     entry_points={
         "console_scripts": [

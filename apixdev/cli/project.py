@@ -1,6 +1,6 @@
 import click
 
-from apixdev.cli.tools import print_list
+from apixdev.cli.tools import abort_if_false, print_list
 from apixdev.core.odoo import Odoo
 from apixdev.core.project import Project
 
@@ -44,26 +44,13 @@ def new(name, **kwargs):
 def update(name, **kwargs):
     """Update project"""
 
-    database = False
-    urls = []
-
     project = Project(name)
 
-    if project.is_ready:
-        project.load_manifest()
-    else:
-        odoo = Odoo.new()
-        database = odoo.get_database_from_uuid(name, strict=True, limit=1)
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        return False
 
-        urls = [
-            ("manifest.yaml", database.manifest_url),
-            ("repositories.yaml", database.repositories_url),
-            ("docker-compose.yaml", database.compose_url),
-        ]
-
-        for name, url in urls:
-            project.download(name, url)
-
+    project.load_manifest()
     project.pull_repositories()
     project.merge_requirements()
 
@@ -80,6 +67,24 @@ def search(name, **kwargs):
     print_list(results)
 
 
+@click.command()
+@click.option(
+    "--yes",
+    is_flag=True,
+    callback=abort_if_false,
+    expose_value=False,
+    prompt="Are you sure you want to delete project ?",
+)
+@click.argument("name")
+def delete(name, **kwargs):
+    """Delete local project"""
+
+    project = Project(name)
+    project.delete()
+    # del project
+
+
 project.add_command(new)
 project.add_command(update)
 project.add_command(search)
+project.add_command(delete)
