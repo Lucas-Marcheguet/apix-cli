@@ -1,24 +1,24 @@
-import os
+# import os
 
-import click
+# import click
 
-from apixdev.apix import apix
-
-
-@click.group()
-def scaffold():
-    """Scaffold functions"""
+# from apixdev.apix import apix
 
 
-@click.command()
-@click.argument("name")
-def module(name):
-    """Generates an Odoo module skeleton"""
-
-    if os.path.exists(os.path.join(os.getcwd(), name)):
-        raise click.UsageError("Module {} already exists.".format(name))
-
-    apix.scaffold_module(name)
+# @click.group()
+# def scaffold():
+#     """Scaffold functions"""
 
 
-scaffold.add_command(module)
+# @click.command()
+# @click.argument("name")
+# def module(name):
+#     """Generates an Odoo module skeleton"""
+
+#     if os.path.exists(os.path.join(os.getcwd(), name)):
+#         raise click.UsageError("Module {} already exists.".format(name))
+
+#     apix.scaffold_module(name)
+
+
+# scaffold.add_command(module)

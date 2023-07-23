@@ -1,35 +1,24 @@
 import configparser
+import getpass
 import logging
 import os
 
-import odoorpc
+import apixdev.vars as vars
 
-import apixdev.config as cfg
+path = os.path.join(vars.HOME_PATH, vars.CONFIG_PATH)
+filename = os.path.join(path, vars.LOGGING_FILE)
+
+if not os.path.isdir(path):
+    os.makedirs(path)
+
+logging.basicConfig(filename=filename, level=vars.LOGGING_LEVEL)
 
 _logger = logging.getLogger(__name__)
 
-
-class SingletonMeta(type):
-    """
-    The Singleton class can be implemented in different ways in Python. Some
-    possible methods include: base class, decorator, metaclass. We will use the
-    metaclass because it is best suited for this purpose.
-    """
-
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        """
-        Possible changes to the value of the `__init__` argument do not affect
-        the returned instance.
-        """
-        if cls not in cls._instances:
-            instance = super().__call__(*args, **kwargs)
-            cls._instances[cls] = instance
-        return cls._instances[cls]
+from apixdev.core.common import SingletonMeta  # noqa: E402
 
 
-class Config:
+class Settings(metaclass=SingletonMeta):
     def __init__(self, path, name="config.ini"):
         self._path = path
         self._name = name
@@ -61,7 +50,7 @@ class Config:
     def logout(self):
         values = self._config["apix"]
         self._config["apix"] = {
-            k: v for k, v in values.items() if k not in cfg.MANDATORY_VALUES
+            k: v for k, v in values.items() if k not in vars.MANDATORY_VALUES
         }
         self.save()
 
@@ -77,10 +66,10 @@ class Config:
 
     def _get_default_values(self):
         return {
-            "apix.port": cfg.DEFAULT_PORT,
-            "apix.protocol": cfg.DEFAULT_PROTOCOL,
-            "apix.timeout": cfg.DEFAULT_TIMEOUT,
-            "local.default_password": cfg.DEFAULT_PASSWORD,
+            "apix.port": vars.DEFAULT_PORT,
+            "apix.protocol": vars.DEFAULT_PROTOCOL,
+            "apix.timeout": vars.DEFAULT_TIMEOUT,
+            "local.default_password": vars.DEFAULT_PASSWORD,
         }
 
     def _prepare_config(self):
@@ -131,30 +120,12 @@ class Config:
 
         self.save()
 
-    # def __getattr__(self, __name):
-    #     return self._config.get('apix', __name)
-
     def get_vars(self):
         return {section: self._config[section].items() for section in self._config}
 
     def get_var(self, name):
         section, key = self.split_var(name)
         return self._config.get(section, key)
-
-    # def get_vars(self, section, keys):
-    #     return dict(filter(lambda item: item[0] in keys, self._config[section].items()))
-
-    # def get_vars(self, section, keys):
-    #     return dict(filter(lambda item: item[0] in keys, self._config[section].items()))
-
-    # def get_vars(self):
-    #     vals = dict()
-    #     sections = ['apix']
-
-    #     for section in sections:
-    #         vals.update({"{}.{}".format(section,k):v for k,v in self._config[section].items() if k not in cfg.IGNORED_VALUES})
-
-    #     return vals
 
     def get_missing_values(self):
         _logger.error("missing values")
@@ -166,64 +137,47 @@ class Config:
 
         missing_values = {
             k: ""
-            for k in cfg.MANDATORY_VALUES
+            for k in vars.MANDATORY_VALUES
             if k not in vals or not vals.get(k, False)
         }
 
         return missing_values.items()
 
-
-class Odoo(metaclass=SingletonMeta):
-    _cr = None
-    _url = ""
-    _db = ""
-    _user = ""
-    _password = ""
-
-    def __init__(self, url, db, user, password, **kwargs):
-        self._url = url
-        self._db = db
-        self._user = user
-        self._password = password
-
-        for k, v in kwargs.items():
-            self.__dict__[k] = v
-
-        self._cr = self._connect()
+    @property
+    def odoo_credentials(self):
+        return [
+            self.get_var("apix.url"),
+            self.get_var("apix.database"),
+            self.get_var("apix.user"),
+            self.get_var("apix.password"),
+        ]
 
     @property
-    def params(self):
-        return {k: v for k, v in self.__dict__.items() if k in cfg.ODOORPC_OPTIONS}
+    def odoo_options(self):
+        return {k: self.get_var("apix.%s" % k) for k in vars.ODOORPC_OPTIONS}
 
-    def _connect(self):
-        _logger.info("Odoorpc {} with {}".format(self._url, self.params))
-        obj = odoorpc.ODOO(self._url, **self.params)
-
-        try:
-            obj.login(self._db, self._user, self._password)
-        except odoorpc.error.RPCError as e:
-            _logger.error(e)
-            obj = None
-
-        return obj
+    def set_config(self):
+        while not self.is_ready:
+            vals = dict()
+            for key, value in self.get_missing_values():
+                if "password" in key:
+                    vals[key] = getpass.getpass("{}: ".format(key.capitalize()))
+                else:
+                    vals[key] = input("{}: ".format(key.capitalize()))
+            self.set_vars(vals)
 
     @property
-    def databases(self):
-        return self._cr.env["saas.database"]
+    def is_ready(self):
+        return True if len(self.get_missing_values()) == 0 else False
 
-    # def list_of(self, records, fields):
-    #     return [record for record in records]
+    @property
+    def workdir(self):
+        # return self._config["local"]["workdir"]
+        return self.get_var("local.workdir")
 
-    def get_databases(self, name, **kwargs):
-        Databases = self._cr.env["saas.database"]
+    @property
+    def env_file(self):
+        return os.path.join(self._path, ".env")
 
-        strict = kwargs.get("strict", True)
-        options = {k: v for k, v in kwargs.items() if k in ["limit"]}
 
-        operator = "=" if strict else "ilike"
-        domain = [("name", operator, name)]
-        ids = Databases.search(domain, **options)
-
-        if ids:
-            return Databases.browse(ids)
-        return False
+settings = Settings(path)

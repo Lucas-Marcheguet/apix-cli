@@ -1,8 +1,8 @@
 import click
 
-import apixdev.cli.tools as tools
-from apixdev.apix import apix
 from apixdev.cli.common import abort_if_false
+from apixdev.cli.tools import print_list
+from apixdev.core.projects import Projects
 
 
 @click.group()
@@ -11,11 +11,11 @@ def projects():
 
 
 @click.command()
-def ps():
+def ls():
     """List local projects"""
 
-    projects = apix.get_local_projects()
-    tools.print_list(projects)
+    projects = Projects.from_path()
+    print_list(projects)
 
 
 @click.command()
@@ -31,5 +31,5 @@ def stop():
     raise NotImplementedError()
 
 
-projects.add_command(ps)
+projects.add_command(ls)
 projects.add_command(stop)

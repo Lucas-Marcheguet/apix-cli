@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="apixdev",
-    version="0.1.2",
+    version="0.2.0",
     description="Apix Developper Toolkit",
     keywords="apix docker odoo development",
     url="https://gitlab.apik.cloud/dev/apixdev",
@@ -40,6 +40,7 @@ setup(
         "sh",
         "tqdm",
         "requirements-parser",
+        "git-aggregator>=4.0.0",
     ],
     entry_points={
         "console_scripts": [

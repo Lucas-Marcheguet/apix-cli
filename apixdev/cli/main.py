@@ -1,28 +1,19 @@
-import logging
-import os
-
 import click
 
-import apixdev.config as cfg
+from apixdev.core.settings import Settings
 
-path = os.path.join(cfg.HOME_PATH, cfg.CONFIG_PATH)
-filename = os.path.join(path, cfg.LOGGING_FILE)
+settings = Settings()
 
-if not os.path.isdir(path):
-    os.makedirs(path)
-
-logging.basicConfig(filename=filename, level=cfg.LOGGING_LEVEL)
-
-
-from apixdev.apix import apix  # noqa: E402
-from apixdev.cli.config import config  # noqa: E402
+# from apixdev.apix import apix  # noqa: E402
+# from apixdev.cli.config import config  # noqa: E402
 from apixdev.cli.project import project  # noqa: E402
 from apixdev.cli.projects import projects  # noqa: E402
-from apixdev.cli.scaffold import scaffold  # noqa: E402
 
-if not apix.is_ready:
+# from apixdev.cli.scaffold import scaffold  # noqa: E402
+
+if not settings.is_ready:
     click.echo("Please fill configuration to continue :")
-    apix.set_config()
+    settings.set_config()
 
 
 @click.group()
@@ -32,5 +23,5 @@ def cli():
 
 cli.add_command(project)
 cli.add_command(projects)
-cli.add_command(config)
-cli.add_command(scaffold)
+# cli.add_command(config)
+# cli.add_command(scaffold)

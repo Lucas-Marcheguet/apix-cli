@@ -36,7 +36,7 @@ IGNORED_VALUES = ["password"]
 BACKUP_URL = "{}/web/database/backup"
 RESTORE_URL = "{}/web/database/restore"
 LOCAL_URL = "http://localhost:8069"
-ODOORPC_OPTIONS = ["port", "protocol", "timeout"]
+ODOORPC_OPTIONS = ["port"]
 
 COMPOSE_TEMPLATE_FILE = "docker-compose.yaml"
 
