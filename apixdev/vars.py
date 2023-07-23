@@ -2,7 +2,17 @@ import logging
 import sys
 from pathlib import Path
 
-import sh
+try:
+    from sh import docker as docker
+except ImportError:
+    print("please install Docker before running this program.")
+    docker = None
+
+try:
+    from sh import docker_compose as docker_compose
+except ImportError:
+    print("please install Docker Compose before running this program.")
+    docker_compose = None
 
 VERSION = "0.1.0"
 
@@ -53,48 +63,48 @@ COMPOSE_TEMPLATE_VALS = {
 COMMANDS = {
     "start": {
         "args": ["up", "-d"],
-        "cmd": sh.docker_compose,
+        "cmd": docker_compose,
     },
     "stop": {
         "args": ["down"],
-        "cmd": sh.docker_compose,
+        "cmd": docker_compose,
     },
     "clear": {
         "args": ["down", "-v"],
-        "cmd": sh.docker_compose,
+        "cmd": docker_compose,
     },
     "ps": {
         "args": ["ps"],
-        "cmd": sh.docker_compose,
+        "cmd": docker_compose,
         "params": {"_tee": "out", "_out": sys.stdout},
     },
     "ps2": {
         "args": ["compose", "ps", "--format", "json"],
-        "cmd": sh.docker,
+        "cmd": docker,
         "params": {"_tee": "out", "_out": "_buffer"},
     },
     "logs": {
         "args": ["logs", "-f"],
-        "cmd": sh.docker,
+        "cmd": docker,
         "params": {"_tee": "out", "_out": sys.stdout},
     },
     "bash": {
         "args": ["exec", "-it", "bash"],
-        "cmd": sh.docker,
+        "cmd": docker,
         "params": {
             "_fg": True,
         },
     },
     "shell": {
         "args": ["exec", "-it", "bash", "-c"],
-        "cmd": sh.docker,
+        "cmd": docker,
         "params": {
             "_fg": True,
         },
     },
     "odoo_update": {
         "args": ["exec", "-it", "bash", "-c"],
-        "cmd": sh.docker,
+        "cmd": docker,
         "params": {
             "_fg": True,
         },

@@ -116,7 +116,6 @@ def delete(name, **kwargs):
 
     project = Project(name)
     project.delete()
-    # del project
 
 
 project.add_command(new)
