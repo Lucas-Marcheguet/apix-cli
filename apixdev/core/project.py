@@ -3,6 +3,7 @@ import subprocess
 from shutil import rmtree
 
 import requests
+from requests.exceptions import HTTPError
 
 from apixdev.core.compose import Compose
 from apixdev.core.settings import Settings
@@ -68,13 +69,27 @@ class Project:
 
     def download(self, filename, url, force=False):
         filepath = os.path.join(self.path, filename)
+        headers = {
+            "X-Api-Token": settings.get_var("apix.token"),
+        }
 
         if force and os.path.exists(filepath):
+            print("remove %s" % filepath)
             os.remove(filepath)
 
-        response = requests.get(url, allow_redirects=False)
+        try:
+            response = requests.get(url, headers=headers, allow_redirects=False)
+            response.raise_for_status()
+        except HTTPError as error:
+            code = error.response.status_code
+            raise Exception(
+                f"Error while trying to download {filename} from {url} (HTTP {code})."
+            )
+
         with open(filepath, "wb") as file:
             file.write(response.content)
+
+        return True
 
     def pull_repositories(self):
         if not self.repositories_file:

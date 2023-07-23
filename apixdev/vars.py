@@ -34,6 +34,7 @@ MANDATORY_VALUES = [
     "apix.url",
     "apix.user",
     "apix.password",
+    "apix.token",
     "local.workdir",
     "local.default_password",
     "git.remote_url",

@@ -1,3 +1,5 @@
+import sys
+
 import click
 
 from apixdev.cli.tools import abort_if_false, print_list
@@ -26,6 +28,11 @@ def new(name, **kwargs):
         odoo = Odoo.new()
         database = odoo.get_databases(name, strict=True, limit=1)
 
+        if not database:
+            click.echo(f"No '{name}' database found.")
+            project.delete()
+            sys.exit(1)
+
         urls = [
             ("manifest.yaml", database.manifest_url),
             ("repositories.yaml", database.repositories_url),
@@ -33,7 +40,11 @@ def new(name, **kwargs):
         ]
 
         for name, url in urls:
-            project.download(name, url)
+            try:
+                project.download(name, url)
+            except Exception as error:
+                click.echo(error)
+                sys.exit(1)
 
         project.pull_repositories()
         project.merge_requirements()
