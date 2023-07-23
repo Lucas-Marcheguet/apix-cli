@@ -43,6 +43,9 @@ def filter_requirements(items):
         reqs[item.name] += [SpecifierSet("".join(specs)) for specs in item.specs]
 
     for name, specs in reqs.items():
+        if not name:
+            continue
+
         if not specs:
             res.append(name)
             continue
@@ -56,7 +59,7 @@ def filter_requirements(items):
 
 
 def list_to_text(items):
-    return "\n\n".join(items)
+    return "\n\n".join(items) if items else ""
 
 
 def nested_set(dic, keys, value):

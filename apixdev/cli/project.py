@@ -40,6 +40,13 @@ def new(name, **kwargs):
 
 
 @click.command()
+@click.option(
+    "--yes",
+    is_flag=True,
+    callback=abort_if_false,
+    expose_value=False,
+    prompt="Are you sure you want to overwrite project ?",
+)
 @click.argument("name")
 def update(name, **kwargs):
     """Update project"""
@@ -53,6 +60,34 @@ def update(name, **kwargs):
     project.load_manifest()
     project.pull_repositories()
     project.merge_requirements()
+
+
+@click.command()
+@click.argument("name")
+def merge(name, **kwargs):
+    """Merge requirements"""
+
+    project = Project(name)
+
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        return False
+
+    project.merge_requirements()
+
+
+@click.command()
+@click.argument("name")
+def pull(name, **kwargs):
+    """Pull repositories"""
+
+    project = Project(name)
+
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        return False
+
+    project.pull_repositories()
 
 
 @click.command()
@@ -88,3 +123,5 @@ project.add_command(new)
 project.add_command(update)
 project.add_command(search)
 project.add_command(delete)
+project.add_command(merge)
+project.add_command(pull)

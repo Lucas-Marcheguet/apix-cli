@@ -50,6 +50,10 @@ class Project:
         return os.path.join(self.path, "manifest.yaml")
 
     @property
+    def env_file(self):
+        return os.path.join(self.path, ".env")
+
+    @property
     def repositories_path(self):
         return os.path.join(self.path, "repositories")
 
@@ -76,6 +80,8 @@ class Project:
         if not self.repositories_file:
             return False
 
+        env_file = self.env_file if os.path.exists(self.env_file) else settings.env_file
+
         # gitaggregate(f"-c {self.repositories_file}", _cwd=self.path)
         # gitaggregate(
         #     [
@@ -96,7 +102,7 @@ class Project:
             "repositories.yaml",
             "--expand-env",
             "--env-file",
-            settings.env_file,
+            env_file,
         ]
         subprocess.call(args, cwd=self.path)
 
@@ -107,7 +113,6 @@ class Project:
         requirements += text_to_list(
             compose.extract("services/odoo/environment/CUSTOM_REQUIREMENTS")
         )
-
         requirements = filter_requirements(requirements)
 
         text = list_to_text(requirements)
