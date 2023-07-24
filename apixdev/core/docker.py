@@ -106,6 +106,9 @@ class Stack:
 
         return container[0]
 
+    def get_containers(self):
+        return self._get_container_names()
+
     def get_container(self, service_name):
         container_name = self._get_container_name(service_name)
         if not container_name:

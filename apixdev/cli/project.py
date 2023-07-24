@@ -7,11 +7,6 @@ from apixdev.core.odoo import Odoo
 from apixdev.core.project import Project
 
 
-@click.group()
-def pj():
-    """Manage apix project"""
-
-
 @click.command()
 @click.argument("name")
 @click.option("--local", "-l", is_flag=True, help="Create blank project")
@@ -130,12 +125,12 @@ def delete(name, **kwargs):
 
 
 @click.command()
-@click.option("--background", "-b", is_flag=True, help="Run on background")
+@click.option("--detach", "-d", is_flag=True, help="Run on background (detach)")
 @click.argument("name")
 def run(name, **kwargs):
     """Run project"""
 
-    run_on_background = kwargs.get("background", False)
+    run_on_background = kwargs.get("detach", False)
     project = Project(name)
 
     if not project.is_ready:
@@ -297,18 +292,17 @@ def update_modules(name, database, modules):
     container.install_modules(database, modules, install=False)
 
 
-pj.add_command(new)
-pj.add_command(update)
-pj.add_command(search)
-pj.add_command(delete)
-pj.add_command(merge)
-pj.add_command(pull)
-pj.add_command(run)
-pj.add_command(stop)
-pj.add_command(clear)
-# pj.add_command(show)
-pj.add_command(logs)
-pj.add_command(bash)
-pj.add_command(shell)
-pj.add_command(install_modules)
-pj.add_command(update_modules)
+@click.command()
+@click.argument("name")
+def show(name):
+    """Show project containers"""
+
+    project = Project(name)
+
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        return False
+
+    stack = project.get_stack()
+    containers = stack.get_containers()
+    print_list(containers)
