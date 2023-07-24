@@ -93,3 +93,17 @@ def bytes_to_json(data):
     json_data = json.loads(res)
 
     return json_data
+
+
+def convert_stdout_to_json(content):
+    try:
+        data = json.loads(content)
+    except json.decoder.JSONDecodeError:
+        content = content.decode("utf8")
+        content = content.strip().rstrip().lstrip()
+        content = f"[{content}]"
+        content = content.replace("}", "},").replace("},]", "}]")
+
+        data = json.loads(content)
+
+    return data

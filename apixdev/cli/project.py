@@ -8,7 +8,7 @@ from apixdev.core.project import Project
 
 
 @click.group()
-def project():
+def pj():
     """Manage apix project"""
 
 
@@ -129,9 +129,163 @@ def delete(name, **kwargs):
     project.delete()
 
 
-project.add_command(new)
-project.add_command(update)
-project.add_command(search)
-project.add_command(delete)
-project.add_command(merge)
-project.add_command(pull)
+@click.command()
+@click.option("--background", "-b", is_flag=True, help="Run on background")
+@click.argument("name")
+def run(name, **kwargs):
+    """Run project"""
+
+    run_on_background = kwargs.get("background", False)
+    project = Project(name)
+
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        return False
+
+    if run_on_background:
+        project.run(detach=True)
+    else:
+        project.run()
+        project.down()
+
+
+@click.command()
+@click.argument("name")
+def stop(name):
+    """Stop project containers"""
+
+    project = Project(name)
+
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        return False
+
+    project.down()
+
+
+@click.command()
+@click.option(
+    "--yes",
+    is_flag=True,
+    callback=abort_if_false,
+    expose_value=False,
+    prompt="Are you sure you want to clear project containers (databsae will be lost) ?",
+)
+@click.argument("name")
+def clear(name, **kwargs):
+    """Clear project containers"""
+
+    project = Project(name)
+
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        return False
+
+    project.clear()
+
+
+@click.command()
+@click.argument("name")
+def show(name):
+    """Ps project containers"""
+
+    project = Project(name)
+
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        return False
+
+    project.ps()
+
+
+@click.command()
+@click.argument("name")
+@click.argument("service")
+def logs(name, service):
+    """Show container logs"""
+
+    project = Project(name)
+
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        return False
+
+    project.logs(service)
+
+
+@click.command()
+@click.argument("name")
+def bash(name):
+    """Attach to Odoo container bash"""
+
+    project = Project(name)
+
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        return False
+
+    project.bash("odoo")
+
+
+@click.command()
+@click.argument("name")
+@click.argument("database")
+def shell(name, database):
+    """Attach to Odoo shell"""
+
+    project = Project(name)
+
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        return False
+
+    project.shell(database)
+
+
+@click.command()
+@click.argument("name")
+@click.argument("database")
+@click.argument("modules")
+def install_modules(name, database, modules):
+    """Update modules on database"""
+
+    project = Project(name)
+
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        return False
+
+    project.update_modules(database, modules, install=True)
+
+
+@click.command()
+@click.argument("name")
+@click.argument("database")
+@click.argument("modules")
+def update_modules(name, database, modules):
+    """Update modules on database"""
+
+    project = Project(name)
+
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        return False
+
+    project.update_modules(database, modules)
+
+
+pj.add_command(new)
+pj.add_command(update)
+pj.add_command(search)
+pj.add_command(delete)
+pj.add_command(merge)
+pj.add_command(pull)
+pj.add_command(run)
+pj.add_command(stop)
+pj.add_command(clear)
+pj.add_command(show)
+pj.add_command(logs)
+pj.add_command(bash)
+pj.add_command(shell)
+pj.add_command(install_modules)
+pj.add_command(update_modules)

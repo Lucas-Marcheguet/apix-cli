@@ -1,17 +1,16 @@
 import logging
-import sys
 from pathlib import Path
 
 try:
-    from sh import docker as docker
+    from sh import docker
 except ImportError:
-    print("please install Docker before running this program.")
+    print("Please install Docker before running this program.")
     docker = None
 
 try:
-    from sh import docker_compose as docker_compose
+    from sh import docker_compose
 except ImportError:
-    print("please install Docker Compose before running this program.")
+    print("Please install Docker Compose before running this program.")
     docker_compose = None
 
 VERSION = "0.1.0"
@@ -20,6 +19,9 @@ HOME_PATH = Path.home()
 
 CONFIG_PATH = ".config/apix"
 CONFIG_FILE = "config.ini"
+
+DEFAULT_TIMEOUT = 60
+DOCKER_SERVICES_COUNT = 3
 
 LOGGING_FILE = "apix.log"
 LOGGING_LEVEL = logging.INFO
@@ -50,55 +52,3 @@ ODOORPC_OPTIONS = [
     "port",
     "protocol",
 ]
-
-
-COMMANDS = {
-    "start": {
-        "args": ["up", "-d"],
-        "cmd": docker_compose,
-    },
-    "stop": {
-        "args": ["down"],
-        "cmd": docker_compose,
-    },
-    "clear": {
-        "args": ["down", "-v"],
-        "cmd": docker_compose,
-    },
-    "ps": {
-        "args": ["ps"],
-        "cmd": docker_compose,
-        "params": {"_tee": "out", "_out": sys.stdout},
-    },
-    "ps2": {
-        "args": ["compose", "ps", "--format", "json"],
-        "cmd": docker,
-        "params": {"_tee": "out", "_out": "_buffer"},
-    },
-    "logs": {
-        "args": ["logs", "-f"],
-        "cmd": docker,
-        "params": {"_tee": "out", "_out": sys.stdout},
-    },
-    "bash": {
-        "args": ["exec", "-it", "bash"],
-        "cmd": docker,
-        "params": {
-            "_fg": True,
-        },
-    },
-    "shell": {
-        "args": ["exec", "-it", "bash", "-c"],
-        "cmd": docker,
-        "params": {
-            "_fg": True,
-        },
-    },
-    "odoo_update": {
-        "args": ["exec", "-it", "bash", "-c"],
-        "cmd": docker,
-        "params": {
-            "_fg": True,
-        },
-    },
-}
