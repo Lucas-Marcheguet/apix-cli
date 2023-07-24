@@ -142,11 +142,14 @@ def run(name, **kwargs):
         click.echo(f"No '{project}' project found locally.")
         return False
 
+    stack = project.get_stack()
+
     if run_on_background:
-        project.run(detach=True)
+        stack.run(run_on_background)
     else:
-        project.run()
-        project.down()
+        # Run on foreground means auto shutdown stack when user exit container
+        stack.run()
+        stack.stop()
 
 
 @click.command()
@@ -160,7 +163,8 @@ def stop(name):
         click.echo(f"No '{project}' project found locally.")
         return False
 
-    project.down()
+    stack = project.get_stack()
+    stack.stop()
 
 
 @click.command()
@@ -181,27 +185,28 @@ def clear(name, **kwargs):
         click.echo(f"No '{project}' project found locally.")
         return False
 
-    project.clear()
+    stack = project.get_stack()
+    stack.clear()
 
 
-@click.command()
-@click.argument("name")
-def show(name):
-    """Ps project containers"""
+# @click.command()
+# @click.argument("name")
+# def show(name):
+#     """Ps project containers"""
 
-    project = Project(name)
+#     project = Project(name)
 
-    if not project.is_ready:
-        click.echo(f"No '{project}' project found locally.")
-        return False
+#     if not project.is_ready:
+#         click.echo(f"No '{project}' project found locally.")
+#         return False
 
-    project.ps()
+#     project.ps()
 
 
 @click.command()
 @click.argument("name")
 @click.argument("service")
-def logs(name, service):
+def logs(name, service="odoo"):
     """Show container logs"""
 
     project = Project(name)
@@ -210,12 +215,18 @@ def logs(name, service):
         click.echo(f"No '{project}' project found locally.")
         return False
 
-    project.logs(service)
+    stack = project.get_stack()
+    try:
+        container = stack.get_container(service)
+    except Exception as error:
+        click.echo(error)
+        sys.exit(1)
+    container.logs()
 
 
 @click.command()
 @click.argument("name")
-def bash(name):
+def bash(name, service="odoo"):
     """Attach to Odoo container bash"""
 
     project = Project(name)
@@ -224,7 +235,13 @@ def bash(name):
         click.echo(f"No '{project}' project found locally.")
         return False
 
-    project.bash("odoo")
+    stack = project.get_stack()
+    try:
+        container = stack.get_container(service)
+    except Exception as error:
+        click.echo(error)
+        sys.exit(1)
+    container.bash()
 
 
 @click.command()
@@ -239,7 +256,9 @@ def shell(name, database):
         click.echo(f"No '{project}' project found locally.")
         return False
 
-    project.shell(database)
+    stack = project.get_stack()
+    container = stack.get_odoo_container()
+    container.shell(database)
 
 
 @click.command()
@@ -255,7 +274,9 @@ def install_modules(name, database, modules):
         click.echo(f"No '{project}' project found locally.")
         return False
 
-    project.update_modules(database, modules, install=True)
+    stack = project.get_stack()
+    container = stack.get_odoo_container()
+    container.install_modules(database, modules, install=True)
 
 
 @click.command()
@@ -271,7 +292,9 @@ def update_modules(name, database, modules):
         click.echo(f"No '{project}' project found locally.")
         return False
 
-    project.update_modules(database, modules)
+    stack = project.get_stack()
+    container = stack.get_odoo_container()
+    container.install_modules(database, modules, install=False)
 
 
 pj.add_command(new)
@@ -283,7 +306,7 @@ pj.add_command(pull)
 pj.add_command(run)
 pj.add_command(stop)
 pj.add_command(clear)
-pj.add_command(show)
+# pj.add_command(show)
 pj.add_command(logs)
 pj.add_command(bash)
 pj.add_command(shell)

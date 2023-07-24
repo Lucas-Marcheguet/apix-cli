@@ -7,10 +7,10 @@ import requests
 from requests.exceptions import HTTPError
 
 from apixdev.core.compose import Compose
-from apixdev.core.exceptions import DownloadError, NoContainerFound
+from apixdev.core.docker import Stack
+from apixdev.core.exceptions import DownloadError
 from apixdev.core.settings import settings, vars
 from apixdev.core.tools import (
-    convert_stdout_to_json,
     filter_requirements,
     get_requirements_from_path,
     list_to_text,
@@ -148,150 +148,8 @@ class Project:
             url = manifest.extract(key)
             self.download(filename, url, True)
 
-    def run(self, **kwargs):
-        detach = kwargs.get("detach", False)
-
-        if detach:
-            cmd = [
-                "docker-compose",
-                "up",
-                "-d",
-            ]
-        else:
-            cmd = [
-                "docker-compose",
-                "run",
-                "--rm",
-                "--service-ports",
-                "odoo",
-                "bash",
-            ]
-
-        subprocess.call(cmd, cwd=self.path)
-
-    def down(self, clear=False):
-        cmd = [
-            "docker-compose",
-            "down",
-        ]
-
-        if clear:
-            cmd.append("-v")
-
-        subprocess.call(cmd, cwd=self.path)
-
-    def clear(self):
-        return self.down(True)
-
-    def _convert_container_info(self, vals_list):
-        def apply(vals):
-            name = vals.get("Name", vals.get("Names", ""))
-            return {
-                "name": name,
-                "state": vals.get("State", ""),
-            }
-
-        return list(map(apply, vals_list))
-
-    def _get_docker_services(self):
-        # Method 1 : docker compose ps
-        cmd = ["docker", "compose", "ps", "--format", "json"]
-        res = subprocess.check_output(cmd, cwd=self.path)
-        data = convert_stdout_to_json(res)
-
-        if len(data) == vars.DOCKER_SERVICES_COUNT:
-            return self._convert_container_info(data)
-
-        # When the stack is not running in background,
-        # the odoo container does not appear with the first ps command
-
-        # Method 2 : docker ps + filtering on project name
-        cmd = ["docker", "ps", "--format", "json"]
-        res = subprocess.check_output(cmd, cwd=self.path)
-        data = convert_stdout_to_json(res)
-
-        data = list(
-            filter(lambda item: item.get("Names", "").startswith(self.name), data)
-        )
-
-        return self._convert_container_info(data)
-
-    @property
-    def is_running(self):
-        services = self._get_docker_services()
-
-        if vars.DOCKER_SERVICES_COUNT < len(services):
-            return False
-
-        states = map(lambda item: item.get("state", False), services)
-
-        if not all(map(lambda item: bool(item in ["running"]), states)):
-            return False
-
-        return True
-
-    def _get_container_names(self):
-        if not self.is_running:
-            return []
-
-        services = self._get_docker_services()
-        return list(map(lambda item: item.get("name", False), services))
-
-    def _get_container(self, service):
-        names = self._get_container_names()
-        container = list(filter(lambda item: service in item, names))
-
-        if not container:
-            return False
-
-        return container[0]
-
-    def ps(self):
-        print(self.is_running)
-        print(self._get_container_names())
-
-    def logs(self, service="odoo"):
-        if not self.is_running:
-            return False
-
-        container = self._get_container(service)
-        cmd = ["docker", "logs", "-f", container]
-
-        subprocess.call(cmd, cwd=self.path)
-
-    def bash(self, service="odoo"):
-        if not self.is_running:
-            return False
-
-        container = self._get_container(service)
-        cmd = ["docker", "exec", "-it", container, "bash"]
-
-        subprocess.call(cmd, cwd=self.path)
-
-    def shell(self, database):
-        if not self.is_running:
-            return False
-
-        odoo_cmd = ["odoo", "shell", "-d", database]
-        container = self._get_container("odoo")
-        cmd = ["docker", "exec", "-it", container] + odoo_cmd
-
-        subprocess.call(cmd, cwd=self.path)
-
-    def update_modules(self, database, modules, **kwargs):
-        if not self.is_running:
-            return False
-
-        container = self._get_container("odoo")
-        if not container:
-            raise NoContainerFound("odoo")
-
-        arg = "-u" if not kwargs.get("install", False) else "-i"
-        odoo_cmd = ["odoo", "-d", database, "--stop-after-init", arg, modules]
-
-        cmd = ["docker", "exec", "-it", container] + odoo_cmd
-
-        subprocess.call(cmd, cwd=self.path)
+    def get_stack(self):
+        return Stack(self.name, self.path)
 
     # def __del__(self):
     #     rmtree(self.path, ignore_errors=True)
