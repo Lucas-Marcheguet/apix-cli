@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="apixdev",
-    version="0.3.0",
+    version="0.3.1",
     description="ApiX CLI",
     keywords="docker odoo development",
     url="https://github.com/apikcloud/apix-cli",
@@ -35,7 +35,6 @@ setup(
         "OdooRPC>=0.9.0",
         "PyYAML>=6.0.1",
         "requests>=2.28.2",
-        "sh>=2.0.4",
         "requirements-parser>=0.5.0",
         "git-aggregator>=4.0",
         "packaging>=23.1",

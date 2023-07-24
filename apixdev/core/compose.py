@@ -31,9 +31,6 @@ class Compose:
 
     def get_path(self, path):
         res = os.path.join(path, self._name)
-
-        print(res)
-
         return res
 
     def update_dict(self, vals):

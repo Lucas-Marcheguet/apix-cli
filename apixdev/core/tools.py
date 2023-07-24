@@ -1,8 +1,18 @@
 import json
 import os
+import subprocess
 
 import requirements as req_tool
 from packaging.specifiers import SpecifierSet
+
+
+def check_system_dependencies(cmd):
+    try:
+        res = subprocess.check_output(cmd)
+    except FileNotFoundError:
+        return False
+
+    return res
 
 
 def text_to_list(data):

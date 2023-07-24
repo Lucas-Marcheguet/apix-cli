@@ -2,14 +2,16 @@ import configparser
 import getpass
 import logging
 import os
+import subprocess
 
 import apixdev.vars as vars
+from apixdev.core.exceptions import ExternalDependenciesMissing
 
-path = os.path.join(vars.HOME_PATH, vars.CONFIG_PATH)
-filename = os.path.join(path, vars.LOGGING_FILE)
+config_dir = os.path.join(vars.HOME_PATH, vars.CONFIG_PATH)
+filename = os.path.join(config_dir, vars.LOGGING_FILE)
 
-if not os.path.isdir(path):
-    os.makedirs(path)
+if not os.path.isdir(config_dir):
+    os.makedirs(config_dir)
 
 logging.basicConfig(filename=filename, level=vars.LOGGING_LEVEL)
 
@@ -18,13 +20,33 @@ _logger = logging.getLogger(__name__)
 from apixdev.core.common import SingletonMeta  # noqa: E402
 
 
+def check_system_dependencies(cmd):
+    try:
+        res = subprocess.check_output(cmd.split(" "))
+        res = res.decode("utf8").strip()
+    except FileNotFoundError:
+        return False
+
+    return res
+
+
 class Settings(metaclass=SingletonMeta):
     def __init__(self, path, name="config.ini"):
         self._path = path
         self._name = name
         self._config = None
 
+        self.docker_version = None
+        self.docker_compose_version = None
+
         self._load()
+
+    def check(self, raise_if_not_found=True):
+        for name, cmd in vars.EXTERNAL_DEPENDENCIES.items():
+            res = check_system_dependencies(cmd)
+            if not res and raise_if_not_found:
+                raise ExternalDependenciesMissing(name)
+            _logger.error("Check failed: %s not found.", name)
 
     @property
     def filepath(self):
@@ -180,4 +202,4 @@ class Settings(metaclass=SingletonMeta):
         return os.path.join(self._path, ".env")
 
 
-settings = Settings(path)
+settings = Settings(config_dir)

@@ -18,3 +18,12 @@ class NoContainerFound(Exception):
         self.name = name
         self.message = f"No container found for {name}."
         super().__init__(self.message)
+
+
+class ExternalDependenciesMissing(Exception):
+    """Exception raised for system package missing ."""
+
+    def __init__(self, name):
+        self.name = name
+        self.message = f"System package missing, please install {name} first."
+        super().__init__(self.message)

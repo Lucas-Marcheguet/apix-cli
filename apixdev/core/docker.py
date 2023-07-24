@@ -4,15 +4,6 @@ from apixdev.core.exceptions import NoContainerFound
 from apixdev.core.settings import vars
 from apixdev.core.tools import convert_stdout_to_json
 
-DOCKER_COMPOSE_RUN_BACKGROUND = "docker-compose up -d"
-DOCKER_COMPOSE_RUN = "docker-compose run --rm --service-ports odoo bash"
-DOCKER_COMPOSE_DOWN = "docker-compose down"
-DOCKER_LOGS = "docker logs -f {}"
-DOCKER_EXEC = "docker exec -it {} {}"
-
-ODOO_MODULES = "odoo -d {} --stop-after-init {} {}"
-ODOO_SHELL = "odoo shell -d {}"
-
 
 class Stack:
     def __init__(self, name, path):
@@ -22,6 +13,7 @@ class Stack:
 
     @property
     def is_running(self):
+        """Check if every containers running as excepted."""
         services = self._inspect_services()
 
         if vars.DOCKER_SERVICES_COUNT < len(services):
@@ -35,15 +27,17 @@ class Stack:
         return True
 
     def run(self, run_on_background=False):
+        """Run docker-compose stack."""
         if run_on_background:
-            cmd = DOCKER_COMPOSE_RUN_BACKGROUND
+            cmd = vars.DOCKER_COMPOSE_RUN_BACKGROUND
         else:
-            cmd = DOCKER_COMPOSE_RUN
+            cmd = vars.DOCKER_COMPOSE_RUN
 
         subprocess.call(cmd.split(" "), cwd=self.path)
 
     def stop(self, clear=False):
-        cmd = DOCKER_COMPOSE_DOWN.split(" ")
+        """Stop docker-compose stack."""
+        cmd = vars.DOCKER_COMPOSE_DOWN.split(" ")
 
         if clear:
             cmd.append("-v")
@@ -51,11 +45,8 @@ class Stack:
         subprocess.call(cmd, cwd=self.path)
 
     def clear(self):
+        """Stop and clear docker-compose stack."""
         self.stop(True)
-
-    # def ps(self):
-    #     print(self.is_running)
-    #     print(self._get_container_names())
 
     def _convert_container_info(self, vals_list):
         def apply(vals):
@@ -107,15 +98,18 @@ class Stack:
         return container[0]
 
     def get_containers(self):
+        """Return containers names"""
         return self._get_container_names()
 
     def get_container(self, service_name):
+        """Return container object"""
         container_name = self._get_container_name(service_name)
         if not container_name:
             raise NoContainerFound(service_name)
         return Container(self, service_name, container_name)
 
     def get_odoo_container(self):
+        """Return Odoo specialized container"""
         container_name = self._get_container_name("odoo")
         if not container_name:
             raise NoContainerFound("odoo")
@@ -130,24 +124,28 @@ class Container:
 
     @property
     def path(self):
+        """Path"""
         return self.stack.path
 
     @property
     def is_running(self):
+        """Checks if parent stack is running"""
         return self.stack.is_running
 
     def logs(self):
+        """Show container logs"""
         if not self.is_running:
             return False
 
-        cmd = DOCKER_LOGS.format(self.name).split(" ")
+        cmd = vars.DOCKER_LOGS.format(self.name).split(" ")
         subprocess.call(cmd, cwd=self.path)
 
     def bash(self):
+        """Attach to container bash"""
         if not self.is_running:
             return False
 
-        cmd = DOCKER_EXEC.format(self.name, "bash").split(" ")
+        cmd = vars.DOCKER_EXEC.format(self.name, "bash").split(" ")
         subprocess.call(cmd, cwd=self.path)
 
 
@@ -156,18 +154,22 @@ class OdooContainer(Container):
         super().__init__(stack, "odoo", name)
 
     def install_modules(self, database, modules, **kwargs):
+        """Install modules list to Odoo database"""
         if not self.is_running:
             return False
 
         odoo_arg = "-u" if not kwargs.get("install", False) else "-i"
-        odoo_cmd = ODOO_MODULES.format(database, odoo_arg, modules)
-        cmd = DOCKER_EXEC.format(self.name, odoo_cmd).split()
+        odoo_cmd = vars.ODOO_MODULES.format(database, odoo_arg, modules)
+        cmd = vars.DOCKER_EXEC.format(self.name, odoo_cmd).split()
 
         subprocess.call(cmd, cwd=self.path)
 
     def shell(self, database):
+        """Attach to Odoo Shell"""
         if not self.is_running:
             return False
 
-        cmd = DOCKER_EXEC.format(self.name, ODOO_SHELL.format(database)).split(" ")
+        cmd = vars.DOCKER_EXEC.format(
+            self.name, vars.ODOO_SHELL.format(database)
+        ).split(" ")
         subprocess.call(cmd, cwd=self.path)

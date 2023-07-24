@@ -1,19 +1,7 @@
 import logging
 from pathlib import Path
 
-try:
-    from sh import docker
-except ImportError:
-    print("Please install Docker before running this program.")
-    docker = None
-
-try:
-    from sh import docker_compose
-except ImportError:
-    print("Please install Docker Compose before running this program.")
-    docker_compose = None
-
-VERSION = "0.1.0"
+VERSION = "0.3.0"
 
 HOME_PATH = Path.home()
 
@@ -52,3 +40,17 @@ ODOORPC_OPTIONS = [
     "port",
     "protocol",
 ]
+
+EXTERNAL_DEPENDENCIES = {
+    "docker": "docker --version",
+    "docker-compose": "docker-compose --version",
+}
+
+DOCKER_COMPOSE_RUN_BACKGROUND = "docker-compose up -d"
+DOCKER_COMPOSE_RUN = "docker-compose run --rm --service-ports odoo bash"
+DOCKER_COMPOSE_DOWN = "docker-compose down"
+DOCKER_LOGS = "docker logs -f {}"
+DOCKER_EXEC = "docker exec -it {} {}"
+
+ODOO_MODULES = "odoo -d {} --stop-after-init {} {}"
+ODOO_SHELL = "odoo shell -d {}"

@@ -22,6 +22,12 @@ from apixdev.cli.project import (
 from apixdev.cli.projects import projects
 from apixdev.core.settings import settings
 
+# try:
+#     settings.check()
+# except ExternalDependenciesMissing as error:
+#     click.echo(error)
+#     sys.exit(1)
+
 if not settings.is_ready:
     click.echo("Please fill configuration to continue :")
     settings.set_config()
