@@ -1,9 +1,11 @@
 import logging
+import ssl
+import urllib
 
 import odoorpc
 
 from apixdev.core.common import SingletonMeta
-from apixdev.core.settings import Settings, vars
+from apixdev.core.settings import settings, vars
 
 _logger = logging.getLogger(__name__)
 
@@ -28,16 +30,28 @@ class Odoo(metaclass=SingletonMeta):
 
     @classmethod
     def new(cls):
-        settings = Settings()
         return cls(*settings.odoo_credentials, **settings.odoo_options)
 
-    @property
-    def params(self):
+    def get_params(self):
         return {k: v for k, v in self.__dict__.items() if k in vars.ODOORPC_OPTIONS}
 
     def _connect(self):
-        _logger.info("Odoorpc {} with {}".format(self._url, self.params))
-        obj = odoorpc.ODOO(self._url, **self.params)
+        options = self.get_params()
+        _logger.info("Odoorpc %s with %s", self._url, options)
+
+        # urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate
+        # FIXME: definitely not the best solution...
+        if settings.no_verify:
+            myssl = ssl.create_default_context()
+            myssl.check_hostname = False
+            myssl.verify_mode = ssl.CERT_NONE
+
+            opener_selfsigned = urllib.request.build_opener(
+                urllib.request.HTTPSHandler(context=myssl)
+            )
+            options["opener"] = opener_selfsigned
+
+        obj = odoorpc.ODOO(self._url, **options)
 
         try:
             obj.login(self._db, self._user, self._password)

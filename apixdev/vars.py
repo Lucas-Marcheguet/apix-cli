@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-VERSION = "0.3.0"
+VERSION = "0.3.2"
 
 HOME_PATH = Path.home()
 
@@ -18,6 +18,7 @@ DEFAULT_PORT = 443
 DEFAULT_PROTOCOL = "jsonrpc+ssl"
 DEFAULT_TIMEOUT = 6000
 DEFAULT_PASSWORD = "admin"
+DEFAULT_NO_VERIFY = False
 
 MANDATORY_VALUES = [
     "apix.database",
@@ -25,6 +26,7 @@ MANDATORY_VALUES = [
     "apix.user",
     "apix.password",
     "apix.token",
+    "apix.no_verify",
     "local.workdir",
     "local.default_password",
     "git.remote_url",

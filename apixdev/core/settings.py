@@ -66,7 +66,7 @@ class Settings(metaclass=SingletonMeta):
             self.set_vars(vals)
 
         else:
-            _logger.info("Load configuration from {}.".format(self.filepath))
+            _logger.info("Load configuration from %s.", self.filepath)
             self._config.read(self.filepath)
 
     def logout(self):
@@ -81,7 +81,7 @@ class Settings(metaclass=SingletonMeta):
         self._load()
 
     def save(self):
-        _logger.info("Save configuration to {}.".format(self.filepath))
+        _logger.info("Save configuration to %s.", self.filepath)
 
         with open(self.filepath, "w") as configfile:
             self._config.write(configfile)
@@ -91,6 +91,7 @@ class Settings(metaclass=SingletonMeta):
             "apix.port": vars.DEFAULT_PORT,
             "apix.protocol": vars.DEFAULT_PROTOCOL,
             "apix.timeout": vars.DEFAULT_TIMEOUT,
+            "apix.no_verify": vars.DEFAULT_NO_VERIFY,
             "local.default_password": vars.DEFAULT_PASSWORD,
         }
 
@@ -100,6 +101,7 @@ class Settings(metaclass=SingletonMeta):
             "apix.port": "",
             "apix.protocol": "",
             "apix.timeout": "",
+            "apix.no_verify": "",
             "apix.database": "",
             "apix.user": "",
             "apix.password": "",
@@ -114,12 +116,12 @@ class Settings(metaclass=SingletonMeta):
 
     def merge_sections(self, vals):
         # [section][key] ==> [section.key]
-        _logger.info("merge sections (before): {}".format(vals))
+        _logger.info("merge sections (before): %s", vals)
         tmp = dict()
         for section in vals.keys():
             tmp.update({self._add_separator([section, k]): v for k, v in vals[section]})
 
-        _logger.info("merge sections: {}".format(tmp))
+        _logger.info("merge sections: %s", tmp)
         return tmp
 
         # {self._add_dot(section, k):v for k,v in vals[section].items()}
@@ -132,11 +134,11 @@ class Settings(metaclass=SingletonMeta):
             curr = tmp.setdefault(section, dict())
             curr[key] = v
 
-        _logger.info("unmerge_sections: {}".format(tmp))
+        _logger.info("unmerge_sections: %s", tmp)
         return tmp
 
     def set_vars(self, vals):
-        _logger.info("set vars: {}".format(vals))
+        _logger.info("set vars: %s", vals)
         vals = self.unmerge_sections(vals)
         self._config.read_dict(vals)
 
@@ -148,6 +150,10 @@ class Settings(metaclass=SingletonMeta):
     def get_var(self, name):
         section, key = self.split_var(name)
         return self._config.get(section, key)
+
+    def get_boolean(self, name, default=False):
+        section, key = self.split_var(name)
+        return self._config.getboolean(section, key) or default
 
     def get_missing_values(self):
         _logger.error("missing values")
@@ -181,11 +187,11 @@ class Settings(metaclass=SingletonMeta):
     def set_config(self):
         while not self.is_ready:
             vals = dict()
-            for key, value in self.get_missing_values():
+            for key, _ in self.get_missing_values():
                 if "password" in key:
-                    vals[key] = getpass.getpass("{}: ".format(key.capitalize()))
+                    vals[key] = getpass.getpass(f"{key.capitalize()}: ")
                 else:
-                    vals[key] = input("{}: ".format(key.capitalize()))
+                    vals[key] = input(f"{key.capitalize()}: ")
             self.set_vars(vals)
 
     @property
@@ -194,12 +200,15 @@ class Settings(metaclass=SingletonMeta):
 
     @property
     def workdir(self):
-        # return self._config["local"]["workdir"]
         return self.get_var("local.workdir")
 
     @property
     def env_file(self):
         return os.path.join(self._path, ".env")
+
+    @property
+    def no_verify(self):
+        return self.get_boolean("apix.no_verify", False)
 
 
 settings = Settings(config_dir)
