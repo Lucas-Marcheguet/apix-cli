@@ -2,7 +2,10 @@
 # apix
 
 _**ApiX** Command Line Tool_
-![PyPI](https://img.shields.io/pypi/v/apixdev) ![PyPI](https://img.shields.io/pypi/pyversions/apixdev) ![GitHub last commit (by committer)](https://img.shields.io/github/last-commit/apikcloud/apix-cli)
+
+![PyPI](https://img.shields.io/pypi/v/apixdev)
+![PyPI](https://img.shields.io/pypi/pyversions/apixdev)
+![GitHub last commit (by committer)](https://img.shields.io/github/last-commit/apikcloud/apix-cli)
 
 
 ## Installation
