@@ -43,23 +43,61 @@
                 <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
                 </li>
               </ul>
+              <p class="caption"><span class="caption-text">Usage</span></p>
               <ul class="current">
-                <li class="toctree-l1 current"><a class="reference internal current" href="./">Project</a>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Project</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#bash">bash</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#clear">clear</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#delete">delete</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#install-modules">install-modules</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#last-backup">last-backup</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#locate">locate</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#logs">logs</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#merge">merge</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#new">new</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#pull">pull</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#restart">restart</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#run">run</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#search">search</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#shell">shell</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#show">show</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#stop">stop</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#update">update</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#update-modules">update-modules</a>
+    </li>
     </ul>
-                </li>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../images/">Images</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../config/">Configuration</a>
+                  </li>
               </ul>
+              <p class="caption"><span class="caption-text">Advanced</span></p>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../projects/">Projects</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../images/">Images</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="../config/">Congifuration</a>
-                </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../build/">Build</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../docs/">Documentation</a>
+                  </li>
               </ul>
       </div>
     </div>
@@ -75,6 +113,7 @@
         <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
+          <li>Usage &raquo;</li>
       <li class="breadcrumb-item active">Project</li>
     <li class="wy-breadcrumbs-aside">
     </li>
@@ -84,10 +123,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="cli-reference">CLI Reference</h1>
-<p>This page provides documentation for our command line tools.</p>
-<h1 id="project">project</h1>
-<p>Manage apix project</p>
+                <h1 id="project">project</h1>
+<p>Manage project</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project [OPTIONS] COMMAND [ARGS]...
 </code></pre>
@@ -95,7 +132,8 @@
 <pre><code>  --help  Show this message and exit.
 </code></pre>
 <h2 id="bash">bash</h2>
-<p>Attach to Odoo container bash</p>
+<p>Attach to Odoo container bash.</p>
+<p><code>NAME</code> is the name of the local project.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project bash [OPTIONS] NAME
 </code></pre>
@@ -103,7 +141,8 @@
 <pre><code>  --help  Show this message and exit.
 </code></pre>
 <h2 id="clear">clear</h2>
-<p>Clear project containers</p>
+<p>Stop project stack (all containers) and clear volumes.</p>
+<p><code>NAME</code> is the name of the local project.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project clear [OPTIONS] NAME
 </code></pre>
@@ -112,7 +151,7 @@
   --help  Show this message and exit.
 </code></pre>
 <h2 id="delete">delete</h2>
-<p>Delete local project</p>
+<p>Delete local project.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project delete [OPTIONS] NAME
 </code></pre>
@@ -121,7 +160,10 @@
   --help  Show this message and exit.
 </code></pre>
 <h2 id="install-modules">install-modules</h2>
-<p>Update modules on database</p>
+<p>Install modules on database.</p>
+<p><code>NAME</code> is the name of the local project.</p>
+<p><code>DATABASE</code> is the name of Odoo database.</p>
+<p><code>MODULES</code> is the list of modules to install, comma separated.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project install-modules [OPTIONS] NAME DATABASE MODULES
 </code></pre>
@@ -129,7 +171,8 @@
 <pre><code>  --help  Show this message and exit.
 </code></pre>
 <h2 id="last-backup">last-backup</h2>
-<p>Get last url backup for online project</p>
+<p>Get last url backup for online project.</p>
+<p><code>NAME</code> is the name of the local project.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project last-backup [OPTIONS] NAME
 </code></pre>
@@ -137,7 +180,8 @@
 <pre><code>  --help  Show this message and exit.
 </code></pre>
 <h2 id="locate">locate</h2>
-<p>Locate project on disk</p>
+<p>Locate project on disk.</p>
+<p><code>NAME</code> is the name of the local project.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project locate [OPTIONS] NAME
 </code></pre>
@@ -145,7 +189,9 @@
 <pre><code>  --help  Show this message and exit.
 </code></pre>
 <h2 id="logs">logs</h2>
-<p>Show container logs</p>
+<p>Show container logs.</p>
+<p><code>NAME</code> is the name of the local project.</p>
+<p><code>SERVICE</code> is the name of one of the stack's services, possible values: odoo, pg or redis.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project logs [OPTIONS] NAME SERVICE
 </code></pre>
@@ -154,7 +200,7 @@
 </code></pre>
 <h2 id="merge">merge</h2>
 <p>Merge requirements from online manifest and local repositories.</p>
-<p>NAME is the name of the local project.</p>
+<p><code>NAME</code> is the name of the local project.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project merge [OPTIONS] NAME
 </code></pre>
@@ -163,7 +209,7 @@
 </code></pre>
 <h2 id="new">new</h2>
 <p>Create new project from online database.</p>
-<p>NAME is the name of the database.</p>
+<p><code>NAME</code> is the name of the database.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project new [OPTIONS] NAME
 </code></pre>
@@ -172,7 +218,7 @@
   --help       Show this message and exit.
 </code></pre>
 <h2 id="pull">pull</h2>
-<p>Pull repositories</p>
+<p>Pull repositories.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project pull [OPTIONS] NAME
 </code></pre>
@@ -180,7 +226,8 @@
 <pre><code>  --help  Show this message and exit.
 </code></pre>
 <h2 id="restart">restart</h2>
-<p>Run project</p>
+<p>Restart project.</p>
+<p><code>NAME</code> is the name of the local project.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project restart [OPTIONS] NAME
 </code></pre>
@@ -189,7 +236,8 @@
   --help        Show this message and exit.
 </code></pre>
 <h2 id="run">run</h2>
-<p>Run project</p>
+<p>Run project.</p>
+<p><code>NAME</code> is the name of the local project.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project run [OPTIONS] NAME
 </code></pre>
@@ -199,7 +247,8 @@
   --help        Show this message and exit.
 </code></pre>
 <h2 id="search">search</h2>
-<p>Search for online project</p>
+<p>Search for online project.</p>
+<p><code>NAME</code> is the name of the online project.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project search [OPTIONS] NAME
 </code></pre>
@@ -207,7 +256,9 @@
 <pre><code>  --help  Show this message and exit.
 </code></pre>
 <h2 id="shell">shell</h2>
-<p>Attach to Odoo shell</p>
+<p>Attach to Odoo shell.</p>
+<p><code>NAME</code> is the name of the local project.</p>
+<p><code>DATABASE</code> is the name of Odoo database.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project shell [OPTIONS] NAME DATABASE
 </code></pre>
@@ -215,7 +266,8 @@
 <pre><code>  --help  Show this message and exit.
 </code></pre>
 <h2 id="show">show</h2>
-<p>Show project containers</p>
+<p>Show project containers and states.</p>
+<p><code>NAME</code> is the name of the local project.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project show [OPTIONS] NAME
 </code></pre>
@@ -223,7 +275,8 @@
 <pre><code>  --help  Show this message and exit.
 </code></pre>
 <h2 id="stop">stop</h2>
-<p>Stop project containers</p>
+<p>Stop project stack (all containers).</p>
+<p><code>NAME</code> is the name of the local project.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project stop [OPTIONS] NAME
 </code></pre>
@@ -232,7 +285,7 @@
 </code></pre>
 <h2 id="update">update</h2>
 <p>Update the local project based on the manifest.</p>
-<p>NAME is the name of the local project.</p>
+<p><code>NAME</code> is the name of the local project.</p>
 <p>Note: Repositorie and requirements are updated.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project update [OPTIONS] NAME
@@ -242,7 +295,10 @@
   --help  Show this message and exit.
 </code></pre>
 <h2 id="update-modules">update-modules</h2>
-<p>Update modules on database</p>
+<p>Update modules on database.</p>
+<p><code>NAME</code> is the name of the local project.</p>
+<p><code>DATABASE</code> is the name of Odoo database.</p>
+<p><code>MODULES</code> is the list of modules to update, comma separated.</p>
 <p><strong>Usage:</strong></p>
 <pre><code>project update-modules [OPTIONS] NAME DATABASE MODULES
 </code></pre>

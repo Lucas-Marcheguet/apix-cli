@@ -42,24 +42,30 @@
               <ul class="current">
                 <li class="toctree-l1 current"><a class="reference internal current" href=".">Home</a>
     <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#quickstart">Quickstart</a>
+    </li>
     </ul>
                 </li>
               </ul>
+              <p class="caption"><span class="caption-text">Usage</span></p>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="project/">Project</a>
-                </li>
+                  <li class="toctree-l1"><a class="reference internal" href="project/">Project</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="projects/">Projects</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="images/">Images</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="config/">Configuration</a>
+                  </li>
               </ul>
+              <p class="caption"><span class="caption-text">Advanced</span></p>
               <ul>
-                <li class="toctree-l1"><a class="reference internal" href="projects/">Projects</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="images/">Images</a>
-                </li>
-              </ul>
-              <ul>
-                <li class="toctree-l1"><a class="reference internal" href="config/">Congifuration</a>
-                </li>
+                  <li class="toctree-l1"><a class="reference internal" href="build/">Build</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="docs/">Documentation</a>
+                  </li>
               </ul>
       </div>
     </div>
@@ -84,8 +90,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
             <div class="section" itemprop="articleBody">
               
-                <h1 id="cli-reference">CLI Reference</h1>
+                <h1 id="apix-cli">ApiX CLI</h1>
 <p>This page provides documentation for our command line tools.</p>
+<hr />
+<h2 id="installation">Installation</h2>
+<p>Install from PyPI:</p>
+<pre><code class="language-bash">pip install apixdev
+</code></pre>
+<h2 id="quickstart">Quickstart</h2>
+<p><em>On first launch, you will be asked to enter certain parameters.</em></p>
+<p>Create project :</p>
+<p><code>project name</code> is the name of the online database you want to create locally.</p>
+<pre><code class="language-bash">apix project new &lt;project name&gt;
+</code></pre>
+<p>Run project :</p>
+<pre><code class="language-bash">apix project run &lt;project name&gt; --reload
+</code></pre>
+<p>Update modules :</p>
+<pre><code class="language-bash">apix project update-modules &lt;project name&gt; &lt;database name&gt; module1,module2
+</code></pre>
               
             </div>
           </div><footer>
@@ -134,5 +157,5 @@
 
 <!--
 MkDocs version : 1.5.1
-Build Date UTC : 2023-07-29 08:53:43.273870+00:00
+Build Date UTC : 2023-07-29 11:22:45.868352+00:00
 -->
