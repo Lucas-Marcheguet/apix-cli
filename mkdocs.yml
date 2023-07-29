@@ -2,10 +2,14 @@ site_name: ApiX CLI
 site_url: https://apik.cloud/
 nav:
   - Home: index.md
-  - Project: project.md
-  - Projects: projects.md
-  - Images: images.md
-  - Congifuration: config.md
+  - Usage:
+    - Project: project.md
+    - Projects: projects.md
+    - Images: images.md
+    - Configuration: config.md
+  - Advanced:
+    - Build: build.md
+    - Documentation: docs.md
 
 markdown_extensions:
     - mkdocs-click

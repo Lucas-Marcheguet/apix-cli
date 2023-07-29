@@ -14,7 +14,7 @@ from apixdev.core.project import Project
 def new(name, **kwargs):
     """Create new project from online database.
 
-    NAME is the name of the database.
+    `NAME` is the name of the database.
     """
 
     is_local = kwargs.get("local", False)
@@ -61,7 +61,7 @@ def new(name, **kwargs):
 def update(name, help="update project"):
     """Update the local project based on the manifest.
 
-    NAME is the name of the local project.
+    `NAME` is the name of the local project.
 
     Note: Repositorie and requirements are updated.
     """
@@ -82,7 +82,7 @@ def update(name, help="update project"):
 def merge(name):
     """Merge requirements from online manifest and local repositories.
 
-    NAME is the name of the local project.
+    `NAME` is the name of the local project.
     """
 
     project = Project(name)
@@ -97,7 +97,7 @@ def merge(name):
 @click.command()
 @click.argument("name")
 def pull(name):
-    """Pull repositories"""
+    """Pull repositories."""
 
     project = Project(name)
 
@@ -111,7 +111,10 @@ def pull(name):
 @click.command()
 @click.argument("name")
 def search(name):
-    """Search for online project"""
+    """Search for online project.
+
+    `NAME` is the name of the online project.
+    """
 
     odoo = Odoo.new()
     databases = odoo.get_databases(name, strict=False)
@@ -130,7 +133,7 @@ def search(name):
 )
 @click.argument("name")
 def delete(name):
-    """Delete local project"""
+    """Delete local project."""
 
     project = Project(name)
     project.delete()
@@ -141,7 +144,10 @@ def delete(name):
 @click.option("--reload", "-r", is_flag=True, help="Dev mode (auto reload)")
 @click.argument("name")
 def run(name, **kwargs):
-    """Run project"""
+    """Run project.
+
+    `NAME` is the name of the local project.
+    """
 
     run_on_background = kwargs.get("detach", False)
     auto_reload = kwargs.get("reload", False)
@@ -165,7 +171,10 @@ def run(name, **kwargs):
 @click.option("--detach", "-d", is_flag=True, help="Run on background (detach)")
 @click.argument("name")
 def restart(name, **kwargs):
-    """Run project"""
+    """Restart project.
+
+    `NAME` is the name of the local project.
+    """
 
     run_on_background = kwargs.get("detach", False)
     project = Project(name)
@@ -188,7 +197,10 @@ def restart(name, **kwargs):
 @click.command()
 @click.argument("name")
 def stop(name):
-    """Stop project containers"""
+    """Stop project stack (all containers).
+
+    `NAME` is the name of the local project.
+    """
 
     project = Project(name)
 
@@ -210,7 +222,10 @@ def stop(name):
 )
 @click.argument("name")
 def clear(name):
-    """Clear project containers"""
+    """Stop project stack (all containers) and clear volumes.
+
+    `NAME` is the name of the local project.
+    """
 
     project = Project(name)
 
@@ -226,7 +241,12 @@ def clear(name):
 @click.argument("name")
 @click.argument("service")
 def logs(name, service="odoo"):
-    """Show container logs"""
+    """Show container logs.
+
+    `NAME` is the name of the local project.
+
+    `SERVICE` is the name of one of the stack's services, possible values: odoo, pg or redis.
+    """
 
     project = Project(name)
 
@@ -246,7 +266,10 @@ def logs(name, service="odoo"):
 @click.command()
 @click.argument("name")
 def bash(name, service="odoo"):
-    """Attach to Odoo container bash"""
+    """Attach to Odoo container bash.
+
+    `NAME` is the name of the local project.
+    """
 
     project = Project(name)
 
@@ -267,7 +290,12 @@ def bash(name, service="odoo"):
 @click.argument("name")
 @click.argument("database")
 def shell(name, database):
-    """Attach to Odoo shell"""
+    """Attach to Odoo shell.
+
+    `NAME` is the name of the local project.
+
+    `DATABASE` is the name of Odoo database.
+    """
 
     project = Project(name)
 
@@ -285,7 +313,14 @@ def shell(name, database):
 @click.argument("database")
 @click.argument("modules")
 def install_modules(name, database, modules):
-    """Update modules on database"""
+    """Install modules on database.
+
+    `NAME` is the name of the local project.
+
+    `DATABASE` is the name of Odoo database.
+
+    `MODULES` is the list of modules to install, comma separated.
+    """
 
     project = Project(name)
 
@@ -303,7 +338,14 @@ def install_modules(name, database, modules):
 @click.argument("database")
 @click.argument("modules")
 def update_modules(name, database, modules):
-    """Update modules on database"""
+    """Update modules on database.
+
+    `NAME` is the name of the local project.
+
+    `DATABASE` is the name of Odoo database.
+
+    `MODULES` is the list of modules to update, comma separated.
+    """
 
     project = Project(name)
 
@@ -319,7 +361,10 @@ def update_modules(name, database, modules):
 @click.command()
 @click.argument("name")
 def show(name):
-    """Show project containers"""
+    """Show project containers and states.
+
+    `NAME` is the name of the local project.
+    """
 
     project = Project(name)
 
@@ -335,7 +380,10 @@ def show(name):
 @click.command()
 @click.argument("name")
 def locate(name):
-    """Locate project on disk"""
+    """Locate project on disk.
+
+    `NAME` is the name of the local project.
+    """
     project = Project(name)
 
     if not project.is_ready:
@@ -349,7 +397,10 @@ def locate(name):
 @click.command()
 @click.argument("name")
 def last_backup(name):
-    """Get last url backup for online project"""
+    """Get last url backup for online project.
+
+    `NAME` is the name of the local project.
+    """
 
     project = Project(name)
 
@@ -359,8 +410,6 @@ def last_backup(name):
 
     if not project.uuid:
         project.load_manifest()
-
-    print(project.uuid)
 
     odoo = Odoo.new()
     url = odoo.get_last_backup_url(project.uuid)

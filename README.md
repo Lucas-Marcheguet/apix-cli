@@ -1,112 +1,42 @@
-# ApiX CLI
 
-
+# apix
 
 _**ApiX** Command Line Tool_
+![PyPI](https://img.shields.io/pypi/v/apixdev) ![PyPI](https://img.shields.io/pypi/pyversions/apixdev) ![GitHub last commit (by committer)](https://img.shields.io/github/last-commit/apikcloud/apix-cli)
 
 
+## Installation
 
-----------
+Install from PyPI:
+
+```bash
+pip install apixdev
+```
 
 ## Quickstart
 
+*On first launch, you will be asked to enter certain parameters.*
+
+Create project :
+
+`project name` is the name of the online database you want to create locally.
+```bash
+apix project new <project name>
 ```
 
-pip install apixdev
+Run project :
 
+```bash
+apix project run <project name> --reload
 ```
 
+Update modules :
+
+```bash
+apix project update-modules <project name> <database name> module1,module2
 ```
 
-apix
+## Documentation
 
-```
-
-## Developpment
-
-```
-
-pip install -e .
-
-```
-
-## Build
-
-```
-
-pip install twine
-
-```
-
-Check setup.py
-
-```
-
-python3 setup.py check
-
-```
-
-Build distribution
-
-```
-
-python3 setup.py sdist
-
-```
-
-or
-
-```
-
-python3 -m build
-
-```
-
-Upload package to Pypi repo
-
-```
-
-twine upload --repository-url https://test.pypi.org/legacy/ dist/*
-
-```
-
-Test package
-
-```
-
-pip install -i https://test.pypi.org/simple/ apixdev==0.2.0
-
-```
-
-
-
-Finnaly, upload to Pypi
-
-```
-
-twine upload dist/*
-
-```
-
-## Test package with Docker
-
-```
-./test_python310.sh
-```
-or
-```
-docker run -v `pwd`:`pwd` -w `pwd` --name pytest -it -d python:3.10
-docker exec -it pytest bash
-```
-
-```
-$ pip install -e .
-$ apix [...]
-```
-```
-./clear.sh
-```
-or
-```
-docker stop pytest && docker rm pytest
-```
+Please refer to :
+[https://apikcloud.github.io/apix-cli/](https://apikcloud.github.io/apix-cli/)

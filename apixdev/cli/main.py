@@ -1,28 +1,9 @@
 import click
 
-from apixdev.cli.config import config
-from apixdev.cli.images import images
-from apixdev.cli.project import (
-    bash,
-    clear,
-    delete,
-    install_modules,
-    last_backup,
-    locate,
-    logs,
-    merge,
-    new,
-    pull,
-    restart,
-    run,
-    search,
-    shell,
-    show,
-    stop,
-    update,
-    update_modules,
-)
-from apixdev.cli.projects import projects
+import apixdev.cli.config as config_cmd
+import apixdev.cli.images as images_cmd
+import apixdev.cli.project as project_cmd
+import apixdev.cli.projects as projects_cmd
 from apixdev.core.settings import settings
 
 # try:
@@ -43,28 +24,52 @@ def cli():
 
 @click.group()
 def project():
-    """Manage apix project"""
+    """Manage project"""
 
 
-project.add_command(new)
-project.add_command(update)
-project.add_command(search)
-project.add_command(delete)
-project.add_command(merge)
-project.add_command(pull)
-project.add_command(run)
-project.add_command(restart)
-project.add_command(stop)
-project.add_command(clear)
-project.add_command(show)
-project.add_command(logs)
-project.add_command(locate)
-project.add_command(bash)
-project.add_command(shell)
-project.add_command(install_modules)
-project.add_command(update_modules)
-project.add_command(last_backup)
+@click.group()
+def projects():
+    """Manage projects"""
 
+
+@click.group()
+def images():
+    """Manage Docker images"""
+
+
+@click.group()
+def config():
+    """View and edit configuration"""
+
+
+project.add_command(project_cmd.new)
+project.add_command(project_cmd.update)
+project.add_command(project_cmd.search)
+project.add_command(project_cmd.delete)
+project.add_command(project_cmd.merge)
+project.add_command(project_cmd.pull)
+project.add_command(project_cmd.run)
+project.add_command(project_cmd.restart)
+project.add_command(project_cmd.stop)
+project.add_command(project_cmd.clear)
+project.add_command(project_cmd.show)
+project.add_command(project_cmd.logs)
+project.add_command(project_cmd.locate)
+project.add_command(project_cmd.bash)
+project.add_command(project_cmd.shell)
+project.add_command(project_cmd.install_modules)
+project.add_command(project_cmd.update_modules)
+project.add_command(project_cmd.last_backup)
+
+projects.add_command(projects_cmd.ls)
+projects.add_command(projects_cmd.stop)
+
+images.add_command(images_cmd.ls)
+
+config.add_command(config_cmd.view)
+config.add_command(config_cmd.clear)
+config.add_command(config_cmd.set_value)
+config.add_command(config_cmd.edit)
 
 cli.add_command(project)
 cli.add_command(projects)

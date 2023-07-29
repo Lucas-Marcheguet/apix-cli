@@ -1,12 +1,8 @@
 import click
 
 from apixdev.cli.tools import abort_if_false, print_list
+from apixdev.core.exceptions import CommandNotImplemented
 from apixdev.core.projects import Projects
-
-
-@click.group()
-def projects():
-    """Manage projects"""
 
 
 @click.command()
@@ -27,8 +23,4 @@ def ls():
 )
 def stop():
     """Stop all projects"""
-    raise NotImplementedError()
-
-
-projects.add_command(ls)
-projects.add_command(stop)
+    raise CommandNotImplemented("stop")
