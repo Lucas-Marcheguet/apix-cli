@@ -1,9 +1,7 @@
-import subprocess
+from apixdev.core.settings import settings, vars
+from apixdev.core.tools import bytes_to_json, dict_to_dataframe, run_external_command
 
-import pandas
-
-from apixdev.core.settings import Settings
-from apixdev.core.tools import bytes_to_json
+# pylint: disable=C0103
 
 
 class Images:
@@ -12,16 +10,18 @@ class Images:
 
     @staticmethod
     def ls():
-        settings = Settings()
+        """List local docker images related to ApiX repository."""
+
         repository = settings.get_var("docker.repository")
 
-        args = ["docker", "image", "ls", "--format", "json"]
-        res = subprocess.check_output(args)
+        res = run_external_command(vars.DOCKER_LIST_IMAGES)
         data = bytes_to_json(res)
-
-        df = pandas.DataFrame(data)
+        df = dict_to_dataframe(data)
         df2 = df.query(f"Repository == '{repository}'")
+
+        # TODO: Return image size
         # df2[["Tag", "Size"]].to_dict(orient="records")
+
         res = sorted(df2["Tag"].tolist())
 
         return res

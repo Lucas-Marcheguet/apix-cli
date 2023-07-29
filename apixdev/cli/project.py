@@ -38,9 +38,9 @@ def new(name, **kwargs):
             ("docker-compose.yaml", database.compose_url),
         ]
 
-        for name, url in urls:
+        for filename, url in urls:
             try:
-                project.download(name, url)
+                project.download(filename, url)
             except DownloadError as error:
                 click.echo(error)
                 sys.exit(1)
@@ -58,7 +58,7 @@ def new(name, **kwargs):
     prompt="Are you sure you want to overwrite project ?",
 )
 @click.argument("name")
-def update(name, help="update project"):
+def update(name):
     """Update the local project based on the manifest.
 
     `NAME` is the name of the local project.
@@ -360,7 +360,7 @@ def update_modules(name, database, modules):
 
 @click.command()
 @click.argument("name")
-def show(name):
+def status(name):
     """Show project containers and states.
 
     `NAME` is the name of the local project.
@@ -374,6 +374,11 @@ def show(name):
 
     stack = project.get_stack()
     containers = stack.get_containers()
+
+    if not containers:
+        click.echo(f"'{project}' stack is down.")
+        sys.exit(1)
+
     print_list(containers)
 
 

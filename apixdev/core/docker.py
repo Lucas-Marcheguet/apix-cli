@@ -1,8 +1,6 @@
-import subprocess
-
 from apixdev.core.exceptions import NoContainerFound
 from apixdev.core.settings import vars
-from apixdev.core.tools import convert_stdout_to_json
+from apixdev.core.tools import convert_stdout_to_json, run_external_command
 
 
 class Stack:
@@ -36,7 +34,7 @@ class Stack:
             else:
                 cmd = vars.DOCKER_COMPOSE_RUN
 
-        subprocess.call(cmd.split(" "), cwd=self.path)
+        run_external_command(cmd, result=False, cwd=self.path)
 
     def stop(self, clear=False):
         """Stop docker-compose stack."""
@@ -45,13 +43,13 @@ class Stack:
         if clear:
             cmd.append("-v")
 
-        subprocess.call(cmd, cwd=self.path)
+        run_external_command(cmd, result=False, cwd=self.path)
 
     def clear(self):
         """Stop and clear docker-compose stack."""
         self.stop(True)
 
-    def _convert_container_info(self, vals_list):
+    def _convert_container_info(self, vals_list):  # pylint: disable=R0201
         def apply(vals):
             name = vals.get("Name", vals.get("Names", ""))
             return {
@@ -63,8 +61,7 @@ class Stack:
 
     def _inspect_services(self):
         # Method 1 : docker compose ps
-        cmd = ["docker", "compose", "ps", "--format", "json"]
-        res = subprocess.check_output(cmd, cwd=self.path)
+        res = run_external_command(vars.DOCKER_COMPOSE_PS, cwd=self.path)
         data = convert_stdout_to_json(res)
 
         if len(data) == vars.DOCKER_SERVICES_COUNT:
@@ -74,8 +71,7 @@ class Stack:
         # the odoo container does not appear with the first ps command
 
         # Method 2 : docker ps + filtering on project name
-        cmd = ["docker", "ps", "--format", "json"]
-        res = subprocess.check_output(cmd, cwd=self.path)
+        res = run_external_command(vars.DOCKER_PS, cwd=self.path)
         data = convert_stdout_to_json(res)
 
         data = list(
@@ -141,7 +137,9 @@ class Container:
             return False
 
         cmd = vars.DOCKER_LOGS.format(self.name).split(" ")
-        subprocess.call(cmd, cwd=self.path)
+        run_external_command(cmd, result=False, cwd=self.path)
+
+        return True
 
     def bash(self):
         """Attach to container bash"""
@@ -149,7 +147,9 @@ class Container:
             return False
 
         cmd = vars.DOCKER_EXEC.format(self.name, "bash").split(" ")
-        subprocess.call(cmd, cwd=self.path)
+        run_external_command(cmd, result=False, cwd=self.path)
+
+        return True
 
 
 class OdooContainer(Container):
@@ -165,7 +165,9 @@ class OdooContainer(Container):
         odoo_cmd = vars.ODOO_MODULES.format(database, odoo_arg, modules)
         cmd = vars.DOCKER_EXEC.format(self.name, odoo_cmd).split()
 
-        subprocess.call(cmd, cwd=self.path)
+        run_external_command(cmd, result=False, cwd=self.path)
+
+        return True
 
     def shell(self, database):
         """Attach to Odoo Shell"""
@@ -175,4 +177,6 @@ class OdooContainer(Container):
         cmd = vars.DOCKER_EXEC.format(
             self.name, vars.ODOO_SHELL.format(database)
         ).split(" ")
-        subprocess.call(cmd, cwd=self.path)
+        run_external_command(cmd, result=False, cwd=self.path)
+
+        return True

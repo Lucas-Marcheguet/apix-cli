@@ -37,7 +37,8 @@ class Project:
 
     @classmethod
     def from_path(cls, path):
-        """Load project from path"""
+        """Load project from path."""
+
         name = os.path.basename(path)
         instance = cls(name, path)
 
@@ -45,32 +46,38 @@ class Project:
 
     @property
     def compose_file(self):
-        """Complete filepath to docker-compose.yaml"""
+        """Complete filepath to docker-compose.yaml."""
+
         return os.path.join(self.path, "docker-compose.yaml")
 
     @property
     def repositories_file(self):
-        """Complete filepath to repositories.yaml"""
+        """Complete filepath to repositories.yaml."""
+
         return os.path.join(self.path, "repositories.yaml")
 
     @property
     def manifest_file(self):
-        """Complete filepath to manifest.yaml"""
+        """Complete filepath to manifest.yaml."""
+
         return os.path.join(self.path, "manifest.yaml")
 
     @property
     def env_file(self):
-        """Complete filepath to .env file"""
+        """Complete filepath to .env file."""
+
         return os.path.join(self.path, ".env")
 
     @property
     def repositories_path(self):
-        """Complete path to repositories"""
+        """Complete path to repositories."""
+
         return os.path.join(self.path, "repositories")
 
     @property
     def is_ready(self):
-        """A project is considered ready if all 3 manifests are present"""
+        """A project is considered ready if all 3 manifests are present."""
+
         files = [
             self.compose_file,
             self.repositories_file,
@@ -79,13 +86,15 @@ class Project:
         return bool(all(map(os.path.exists, files)))
 
     def download(self, filename, url, force=False):
+        """Generic method to download file from ApiX database."""
+
         filepath = os.path.join(self.path, filename)
         headers = {
             "X-Api-Token": settings.get_var("apix.token"),
         }
 
         if force and os.path.exists(filepath):
-            _logger.info("Remove %s file", filepath)
+            _logger.debug("Remove %s file", filepath)
             os.remove(filepath)
 
         try:
@@ -122,7 +131,11 @@ class Project:
         ]
         subprocess.call(args, cwd=self.path)
 
+        return True
+
     def merge_requirements(self):
+        """Merge all requirements from manifest and repositories."""
+
         compose = Compose.from_path(self.compose_file)
 
         requirements = get_requirements_from_path(self.repositories_path)
@@ -136,6 +149,8 @@ class Project:
         compose.save(self.compose_file)
 
     def load_manifest(self):
+        """Load YAML manifest and download files related."""
+
         manifest = Compose.from_path(self.manifest_file)
         self.uuid = manifest.extract("uuid")
 
@@ -149,15 +164,13 @@ class Project:
             self.download(filename, url, True)
 
     def get_stack(self):
+        """Return Stack object."""
+
         return Stack(self.name, self.path)
 
-    # def __del__(self):
-    #     rmtree(self.path, ignore_errors=True)
-    #     self.root_path = None
-    #     self.path = None
-    #     self.name = None
-
     def delete(self):
+        """Delete project and remove files."""
+
         rmtree(self.path, ignore_errors=True)
         self.root_path = None
         self.path = None

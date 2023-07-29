@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 
-VERSION = "0.3.2"
+VERSION = "0.3.4"
 
 HOME_PATH = Path.home()
 
@@ -53,10 +53,12 @@ DOCKER_COMPOSE_RUN_DEV = (
     "docker-compose run --rm --service-ports odoo odoo --dev=reload"
 )
 DOCKER_COMPOSE_RUN = "docker-compose run --rm --service-ports odoo bash"
-
 DOCKER_COMPOSE_DOWN = "docker-compose down"
+DOCKER_COMPOSE_PS = "docker compose ps --format json"
+DOCKER_PS = "docker ps --format json"
 DOCKER_LOGS = "docker logs -f {}"
 DOCKER_EXEC = "docker exec -it {} {}"
+DOCKER_LIST_IMAGES = "docker image ls --format json"
 
 ODOO_MODULES = "odoo -d {} --stop-after-init {} {}"
 ODOO_SHELL = "odoo shell -d {}"

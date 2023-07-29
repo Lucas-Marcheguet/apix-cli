@@ -6,7 +6,7 @@ from apixdev.core.projects import Projects
 
 
 @click.command()
-def ls():
+def ls():  # pylint: disable=C0103
     """List local projects"""
 
     projects = Projects.from_path()

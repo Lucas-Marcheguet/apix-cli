@@ -1,3 +1,5 @@
+# pylint: disable=C0103
+
 import click
 
 from apixdev.cli.tools import print_list

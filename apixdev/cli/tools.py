@@ -1,28 +1,31 @@
 import click
 
+from apixdev.core.tools import dict_to_string
 
-def print_list(items, index=True):
-    click.echo("{} item(s) found".format(len(items)))
+
+def print_list(items):
+    """Echo list with click."""
+
+    click.echo(f"{len(items)} item(s) found")
     for i, item in enumerate(items, 1):
         if isinstance(item, dict):
-            # print_dict(item)
-            click.echo("{}.\t {o}".format(i, o=dict_to_string(item)))
+            click.echo(f"{i}.\t {dict_to_string(item)}")
         else:
-            click.echo("{}.\t {o}".format(i, o=item))
+            click.echo(f"{i}.\t {item}")
 
 
 def print_dict(vals, index=True):
+    """Echo dict with click."""
+
     for i, key in enumerate(vals.keys(), 1):
         if index:
-            click.echo("{}.\t {}: {}".format(i, key, vals[key]))
+            click.echo(f"{i}.\t {key}: {vals[key]}")
         else:
-            click.echo("{}: {}".format(key, vals[key]))
+            click.echo(f"{key}: {vals[key]}")
 
 
-def dict_to_string(vals):
-    return ", ".join(["{}: {}".format(k, v) for k, v in vals.items()])
+def abort_if_false(ctx, _, value):
+    """Confirm: Abort if false."""
 
-
-def abort_if_false(ctx, param, value):
     if not value:
         ctx.abort()

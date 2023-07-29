@@ -17,31 +17,36 @@ class Odoo(metaclass=SingletonMeta):
     _user = ""
     _password = ""
 
-    def __init__(self, url, db, user, password, **kwargs):
+    def __init__(self, url, dbname, user, password, **kwargs):
         self._url = url
-        self._db = db
+        self._db = dbname
         self._user = user
         self._password = password
 
-        for k, v in kwargs.items():
-            self.__dict__[k] = v
+        for key, value in kwargs.items():
+            self.__dict__[key] = value
 
         self._cr = self._connect()
 
     @classmethod
     def new(cls):
+        """Return Odoo object with credentials and options."""
         return cls(*settings.odoo_credentials, **settings.odoo_options)
 
     @property
     def saas_database(self):
+        """Return SaaS Database object."""
+
         return self._cr.env["saas.database"]
 
     def get_params(self):
+        """Return Odoo options."""
+
         return {k: v for k, v in self.__dict__.items() if k in vars.ODOORPC_OPTIONS}
 
     def _connect(self):
         options = self.get_params()
-        _logger.info("Odoorpc %s with %s", self._url, options)
+        _logger.debug("Odoorpc %s with %s", self._url, options)
 
         # urlopen error [SSL: CERTIFICATE_VERIFY_FAILED] certificate verify failed: unable to get local issuer certificate
         # FIXME: definitely not the best solution...
@@ -59,13 +64,15 @@ class Odoo(metaclass=SingletonMeta):
 
         try:
             obj.login(self._db, self._user, self._password)
-        except odoorpc.error.RPCError as e:
-            _logger.error(e)
+        except odoorpc.error.RPCError as error:
+            _logger.error(error)
             obj = None
 
         return obj
 
     def get_databases(self, name, **kwargs):
+        """Search on ApiX databases."""
+
         strict = kwargs.get("strict", True)
         options = {k: v for k, v in kwargs.items() if k in ["limit"]}
 
@@ -77,7 +84,9 @@ class Odoo(metaclass=SingletonMeta):
             return self.saas_database.browse(ids)
         return False
 
-    def get_database_from_uuid(self, uuid):
+    def get_database_by_uuid(self, uuid):
+        """Get database object by UUID."""
+
         domain = [("uuid", "=", uuid)]
         ids = self.saas_database.search(domain, limit=1)
         if ids:
@@ -85,12 +94,13 @@ class Odoo(metaclass=SingletonMeta):
         return False
 
     def get_last_backup_url(self, uuid):
-        ids = self.saas_database.search([("uuid", "=", uuid)], limit=1)
+        """Get last backup url from ApiX database."""
 
-        if not ids:
+        database = self.get_database_by_uuid(uuid)
+
+        if not database:
             return False
 
-        database = self.saas_database.browse(ids)
         action = database.action_get_last_backup()
 
         return action.get("url", False)

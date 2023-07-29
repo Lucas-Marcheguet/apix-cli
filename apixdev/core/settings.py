@@ -2,32 +2,26 @@ import configparser
 import getpass
 import logging
 import os
-import subprocess
 
 import apixdev.vars as vars
 from apixdev.core.exceptions import ExternalDependenciesMissing
+from apixdev.core.tools import (
+    merge_sections,
+    run_external_command,
+    split_var,
+    unmerge_sections,
+)
 
 config_dir = os.path.join(vars.HOME_PATH, vars.CONFIG_PATH)
-filename = os.path.join(config_dir, vars.LOGGING_FILE)
 
 if not os.path.isdir(config_dir):
     os.makedirs(config_dir)
 
-logging.basicConfig(filename=filename, level=vars.LOGGING_LEVEL)
+logging.basicConfig(level=vars.LOGGING_LEVEL)
 
 _logger = logging.getLogger(__name__)
 
-from apixdev.core.common import SingletonMeta  # noqa: E402
-
-
-def check_system_dependencies(cmd):
-    try:
-        res = subprocess.check_output(cmd.split(" "))
-        res = res.decode("utf8").strip()
-    except FileNotFoundError:
-        return False
-
-    return res
+from apixdev.core.common import SingletonMeta  # noqa: E402, pylint: disable=C0413
 
 
 class Settings(metaclass=SingletonMeta):
@@ -41,52 +35,47 @@ class Settings(metaclass=SingletonMeta):
 
         self._load()
 
-    def check(self, raise_if_not_found=True):
-        for name, cmd in vars.EXTERNAL_DEPENDENCIES.items():
-            res = check_system_dependencies(cmd)
-            if not res and raise_if_not_found:
-                raise ExternalDependenciesMissing(name)
-            _logger.error("Check failed: %s not found.", name)
-
     @property
     def filepath(self):
+        """Configuration filepath."""
         return os.path.join(self._path, self._name)
 
-    def _load(self):
-        self._config = configparser.ConfigParser()
-        if not os.path.isdir(self._path):
-            os.makedirs(self._path)
+    @property
+    def odoo_credentials(self):
+        """Odoo credentials property."""
+        return [
+            self.get_var("apix.url"),
+            self.get_var("apix.database"),
+            self.get_var("apix.user"),
+            self.get_var("apix.password"),
+        ]
 
-        if not os.path.isfile(self.filepath):
-            _logger.info("New configuration file.")
+    @property
+    def odoo_options(self):
+        """Odoo options property."""
+        return {key: self.get_var(f"apix.{key}") for key in vars.ODOORPC_OPTIONS}
 
-            vals = self._prepare_config()
-            vals.update(self._get_default_values())
+    @property
+    def is_ready(self):
+        """IS Ready property."""
+        return bool(len(self._get_missing_values()) == 0)
 
-            self.set_vars(vals)
+    @property
+    def workdir(self):
+        """Workdir path property."""
+        return self.get_var("local.workdir")
 
-        else:
-            _logger.info("Load configuration from %s.", self.filepath)
-            self._config.read(self.filepath)
+    @property
+    def env_file(self):
+        """ENV file property."""
+        return os.path.join(self._path, ".env")
 
-    def logout(self):
-        values = self._config["apix"]
-        self._config["apix"] = {
-            k: v for k, v in values.items() if k not in vars.MANDATORY_VALUES
-        }
-        self.save()
+    @property
+    def no_verify(self):
+        """No verify property."""
+        return self.get_boolean("apix.no_verify", False)
 
-    def reload(self):
-        self._config = None
-        self._load()
-
-    def save(self):
-        _logger.info("Save configuration to %s.", self.filepath)
-
-        with open(self.filepath, "w") as configfile:
-            self._config.write(configfile)
-
-    def _get_default_values(self):
+    def _get_default_values(self):  # pylint: disable=R0201
         return {
             "apix.port": vars.DEFAULT_PORT,
             "apix.protocol": vars.DEFAULT_PROTOCOL,
@@ -95,7 +84,7 @@ class Settings(metaclass=SingletonMeta):
             "local.default_password": vars.DEFAULT_PASSWORD,
         }
 
-    def _prepare_config(self):
+    def _prepare_config(self):  # pylint: disable=R0201
         return {
             "apix.url": "",
             "apix.port": "",
@@ -107,61 +96,52 @@ class Settings(metaclass=SingletonMeta):
             "apix.password": "",
         }
 
-    def split_var(self, key, separator="."):
-        section, key = key.split(separator)
-        return section, key
+    def _load(self):
+        self._config = configparser.ConfigParser()
+        if not os.path.isdir(self._path):
+            os.makedirs(self._path)
 
-    def _add_separator(self, items, separator="."):
-        return separator.join(items)
+        if not os.path.isfile(self.filepath):
+            _logger.debug("New configuration file.")
 
-    def merge_sections(self, vals):
-        # [section][key] ==> [section.key]
-        _logger.debug("merge sections (before): %s", vals)
-        tmp = dict()
-        for section in vals.keys():
-            tmp.update({self._add_separator([section, k]): v for k, v in vals[section]})
+            vals = self._prepare_config()
+            vals.update(self._get_default_values())
 
-        _logger.debug("merge sections: %s", tmp)
-        return tmp
+            self.set_vars(vals)
 
-        # {self._add_dot(section, k):v for k,v in vals[section].items()}
-
-    def unmerge_sections(self, vals):
-        # [section.key] ==> [section][key]
-        tmp = dict()
-        for k, v in vals.items():
-            section, key = self.split_var(k)
-            curr = tmp.setdefault(section, dict())
-            curr[key] = v
-
-        _logger.debug("unmerge_sections: %s", tmp)
-        return tmp
+        else:
+            _logger.debug("Load configuration from %s.", self.filepath)
+            self._config.read(self.filepath)
 
     def set_vars(self, vals):
+        """Set values."""
         _logger.debug("set vars: %s", vals)
-        vals = self.unmerge_sections(vals)
+        vals = unmerge_sections(vals)
         self._config.read_dict(vals)
 
         self.save()
 
     def get_vars(self):
+        """Return values."""
         return {section: self._config[section].items() for section in self._config}
 
     def get_var(self, name):
-        section, key = self.split_var(name)
+        """Return value."""
+        section, key = split_var(name)
         return self._config.get(section, key)
 
     def get_boolean(self, name, default=False):
-        section, key = self.split_var(name)
+        """Return boolean value."""
+        section, key = split_var(name)
         return self._config.getboolean(section, key) or default
 
-    def get_missing_values(self):
-        _logger.error("missing values")
+    def _get_missing_values(self):
+        _logger.debug("missing values")
 
-        missing_values = dict()
+        missing_values = {}
 
         vals = self.get_vars()
-        vals = self.merge_sections(vals)
+        vals = merge_sections(vals)
 
         missing_values = {
             k: ""
@@ -171,44 +151,43 @@ class Settings(metaclass=SingletonMeta):
 
         return missing_values.items()
 
-    @property
-    def odoo_credentials(self):
-        return [
-            self.get_var("apix.url"),
-            self.get_var("apix.database"),
-            self.get_var("apix.user"),
-            self.get_var("apix.password"),
-        ]
+    def reload(self):
+        """Reload configuration from file."""
+        self._config = None
+        self._load()
 
-    @property
-    def odoo_options(self):
-        return {k: self.get_var("apix.%s" % k) for k in vars.ODOORPC_OPTIONS}
+    def save(self):
+        """Save current configuration to file."""
+        _logger.debug("Save configuration to %s.", self.filepath)
+
+        with open(self.filepath, "w", encoding="utf8") as configfile:
+            self._config.write(configfile)
+
+    def check(self, raise_if_not_found=True):  # pylint: disable=R0201
+        """Check external dependencies."""
+        for name, cmd in vars.EXTERNAL_DEPENDENCIES.items():
+            res = run_external_command(cmd)
+            if not res and raise_if_not_found:
+                raise ExternalDependenciesMissing(name)
+            _logger.error("Check external dependencies failed: %s not found.", name)
 
     def set_config(self):
+        """Prepare configuration and ask user to complete if necessary."""
         while not self.is_ready:
-            vals = dict()
-            for key, _ in self.get_missing_values():
+            vals = {}
+            for key, _ in self._get_missing_values():
                 if "password" in key:
                     vals[key] = getpass.getpass(f"{key.capitalize()}: ")
                 else:
                     vals[key] = input(f"{key.capitalize()}: ")
             self.set_vars(vals)
 
-    @property
-    def is_ready(self):
-        return True if len(self.get_missing_values()) == 0 else False
-
-    @property
-    def workdir(self):
-        return self.get_var("local.workdir")
-
-    @property
-    def env_file(self):
-        return os.path.join(self._path, ".env")
-
-    @property
-    def no_verify(self):
-        return self.get_boolean("apix.no_verify", False)
+    # def logout(self):
+    #     values = self._config["apix"]
+    #     self._config["apix"] = {
+    #         k: v for k, v in values.items() if k not in vars.MANDATORY_VALUES
+    #     }
+    #     self.save()
 
 
 settings = Settings(config_dir)
