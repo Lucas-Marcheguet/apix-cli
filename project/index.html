@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://apik.cloud/project/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Project - ApiX CLI</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Project";
+        var mkdocs_page_input_path = "project.md";
+        var mkdocs_page_url = "/project/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> ApiX CLI
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <ul class="current">
+                <li class="toctree-l1 current"><a class="reference internal current" href="./">Project</a>
+    <ul class="current">
+    </ul>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../projects/">Projects</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../images/">Images</a>
+                </li>
+              </ul>
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../config/">Congifuration</a>
+                </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">ApiX CLI</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a> &raquo;</li>
+      <li class="breadcrumb-item active">Project</li>
+    <li class="wy-breadcrumbs-aside">
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="cli-reference">CLI Reference</h1>
+<p>This page provides documentation for our command line tools.</p>
+<h1 id="project">project</h1>
+<p>Manage apix project</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project [OPTIONS] COMMAND [ARGS]...
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
+<h2 id="bash">bash</h2>
+<p>Attach to Odoo container bash</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project bash [OPTIONS] NAME
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
+<h2 id="clear">clear</h2>
+<p>Clear project containers</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project clear [OPTIONS] NAME
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --yes
+  --help  Show this message and exit.
+</code></pre>
+<h2 id="delete">delete</h2>
+<p>Delete local project</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project delete [OPTIONS] NAME
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --yes
+  --help  Show this message and exit.
+</code></pre>
+<h2 id="install-modules">install-modules</h2>
+<p>Update modules on database</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project install-modules [OPTIONS] NAME DATABASE MODULES
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
+<h2 id="last-backup">last-backup</h2>
+<p>Get last url backup for online project</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project last-backup [OPTIONS] NAME
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
+<h2 id="locate">locate</h2>
+<p>Locate project on disk</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project locate [OPTIONS] NAME
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
+<h2 id="logs">logs</h2>
+<p>Show container logs</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project logs [OPTIONS] NAME SERVICE
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
+<h2 id="merge">merge</h2>
+<p>Merge requirements from online manifest and local repositories.</p>
+<p>NAME is the name of the local project.</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project merge [OPTIONS] NAME
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
+<h2 id="new">new</h2>
+<p>Create new project from online database.</p>
+<p>NAME is the name of the database.</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project new [OPTIONS] NAME
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  -l, --local  Create blank project
+  --help       Show this message and exit.
+</code></pre>
+<h2 id="pull">pull</h2>
+<p>Pull repositories</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project pull [OPTIONS] NAME
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
+<h2 id="restart">restart</h2>
+<p>Run project</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project restart [OPTIONS] NAME
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  -d, --detach  Run on background (detach)
+  --help        Show this message and exit.
+</code></pre>
+<h2 id="run">run</h2>
+<p>Run project</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project run [OPTIONS] NAME
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  -d, --detach  Running on background (detach)
+  -r, --reload  Dev mode (auto reload)
+  --help        Show this message and exit.
+</code></pre>
+<h2 id="search">search</h2>
+<p>Search for online project</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project search [OPTIONS] NAME
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
+<h2 id="shell">shell</h2>
+<p>Attach to Odoo shell</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project shell [OPTIONS] NAME DATABASE
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
+<h2 id="show">show</h2>
+<p>Show project containers</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project show [OPTIONS] NAME
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
+<h2 id="stop">stop</h2>
+<p>Stop project containers</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project stop [OPTIONS] NAME
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
+<h2 id="update">update</h2>
+<p>Update the local project based on the manifest.</p>
+<p>NAME is the name of the local project.</p>
+<p>Note: Repositorie and requirements are updated.</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project update [OPTIONS] NAME
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --yes
+  --help  Show this message and exit.
+</code></pre>
+<h2 id="update-modules">update-modules</h2>
+<p>Update modules on database</p>
+<p><strong>Usage:</strong></p>
+<pre><code>project update-modules [OPTIONS] NAME DATABASE MODULES
+</code></pre>
+<p><strong>Options:</strong></p>
+<pre><code>  --help  Show this message and exit.
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href=".." class="btn btn-neutral float-left" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../projects/" class="btn btn-neutral float-right" title="Projects">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+    
+      <span><a href=".." style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../projects/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
