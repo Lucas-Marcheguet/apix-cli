@@ -116,12 +116,12 @@ class Settings(metaclass=SingletonMeta):
 
     def merge_sections(self, vals):
         # [section][key] ==> [section.key]
-        _logger.info("merge sections (before): %s", vals)
+        _logger.debug("merge sections (before): %s", vals)
         tmp = dict()
         for section in vals.keys():
             tmp.update({self._add_separator([section, k]): v for k, v in vals[section]})
 
-        _logger.info("merge sections: %s", tmp)
+        _logger.debug("merge sections: %s", tmp)
         return tmp
 
         # {self._add_dot(section, k):v for k,v in vals[section].items()}
@@ -134,11 +134,11 @@ class Settings(metaclass=SingletonMeta):
             curr = tmp.setdefault(section, dict())
             curr[key] = v
 
-        _logger.info("unmerge_sections: %s", tmp)
+        _logger.debug("unmerge_sections: %s", tmp)
         return tmp
 
     def set_vars(self, vals):
-        _logger.info("set vars: %s", vals)
+        _logger.debug("set vars: %s", vals)
         vals = self.unmerge_sections(vals)
         self._config.read_dict(vals)
 

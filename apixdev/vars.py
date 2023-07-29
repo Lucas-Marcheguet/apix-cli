@@ -49,7 +49,11 @@ EXTERNAL_DEPENDENCIES = {
 }
 
 DOCKER_COMPOSE_RUN_BACKGROUND = "docker-compose up -d"
+DOCKER_COMPOSE_RUN_DEV = (
+    "docker-compose run --rm --service-ports odoo odoo --dev=reload"
+)
 DOCKER_COMPOSE_RUN = "docker-compose run --rm --service-ports odoo bash"
+
 DOCKER_COMPOSE_DOWN = "docker-compose down"
 DOCKER_LOGS = "docker logs -f {}"
 DOCKER_EXEC = "docker exec -it {} {}"

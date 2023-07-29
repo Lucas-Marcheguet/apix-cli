@@ -1,9 +1,7 @@
 import click
 
 from apixdev.cli.tools import print_dict
-from apixdev.core.settings import Settings
-
-settings = Settings()
+from apixdev.core.settings import settings
 
 
 @click.group()
@@ -33,6 +31,17 @@ def clear():
     raise NotImplementedError()
 
 
+@click.command()
+def edit():
+    res = click.edit(
+        require_save=True,
+        extension="ini",
+        filename=settings.filepath,
+    )
+    print(res)
+
+
 config.add_command(view)
 config.add_command(clear)
 config.add_command(set)
+config.add_command(edit)

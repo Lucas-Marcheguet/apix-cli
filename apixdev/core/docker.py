@@ -26,12 +26,15 @@ class Stack:
 
         return True
 
-    def run(self, run_on_background=False):
+    def run(self, run_on_background=False, auto_reload=False):
         """Run docker-compose stack."""
         if run_on_background:
             cmd = vars.DOCKER_COMPOSE_RUN_BACKGROUND
         else:
-            cmd = vars.DOCKER_COMPOSE_RUN
+            if auto_reload:
+                cmd = vars.DOCKER_COMPOSE_RUN_DEV
+            else:
+                cmd = vars.DOCKER_COMPOSE_RUN
 
         subprocess.call(cmd.split(" "), cwd=self.path)
 

@@ -32,6 +32,10 @@ class Odoo(metaclass=SingletonMeta):
     def new(cls):
         return cls(*settings.odoo_credentials, **settings.odoo_options)
 
+    @property
+    def saas_database(self):
+        return self._cr.env["saas.database"]
+
     def get_params(self):
         return {k: v for k, v in self.__dict__.items() if k in vars.ODOORPC_OPTIONS}
 
@@ -61,36 +65,32 @@ class Odoo(metaclass=SingletonMeta):
 
         return obj
 
-    @property
-    def databases(self):
-        return self._cr.env["saas.database"]
-
     def get_databases(self, name, **kwargs):
-        Databases = self._cr.env["saas.database"]
-
         strict = kwargs.get("strict", True)
         options = {k: v for k, v in kwargs.items() if k in ["limit"]}
 
         operator = "=" if strict else "ilike"
         domain = [("name", operator, name)]
-        ids = Databases.search(domain, **options)
+        ids = self.saas_database.search(domain, **options)
 
         if ids:
-            return Databases.browse(ids)
+            return self.saas_database.browse(ids)
         return False
 
     def get_database_from_uuid(self, uuid):
-        Databases = self._cr.env["saas.database"]
         domain = [("uuid", "=", uuid)]
-        id = Databases.search(domain, limit=1)
-        if id:
-            return Databases.browse(id)
+        ids = self.saas_database.search(domain, limit=1)
+        if ids:
+            return self.saas_database.browse(ids)
         return False
 
     def get_last_backup_url(self, uuid):
-        database = self._cr.env["saas.database"].search([("uuid", "=", uuid)], limit=1)
+        ids = self.saas_database.search([("uuid", "=", uuid)], limit=1)
 
-        if not database:
+        if not ids:
             return False
 
-        return database.action_get_last_backup().res["url"]
+        database = self.saas_database.browse(ids)
+        action = database.action_get_last_backup()
+
+        return action.get("url", False)

@@ -1,9 +1,12 @@
 import json
+import logging
 import os
 import subprocess
 
 import requirements as req_tool
 from packaging.specifiers import SpecifierSet
+
+_logger = logging.getLogger(__name__)
 
 
 def check_system_dependencies(cmd):
@@ -36,6 +39,7 @@ def get_requirements_from_path(path):
                     requirements += tmp.readlines()
 
     requirements = list({e.strip() for e in requirements})
+    _logger.info("Read requirements from path: %s", requirements)
 
     return requirements
 
@@ -65,6 +69,7 @@ def filter_requirements(items):
         specs = sorted({*specs}, key=str)
         res.append("".join([name, str(specs[-1])]))
 
+    _logger.info("Filtered requirements: %s", requirements)
     return res
 
 

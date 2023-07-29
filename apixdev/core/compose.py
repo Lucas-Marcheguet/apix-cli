@@ -1,9 +1,12 @@
+import logging
 import os
 
 import requests
 import yaml
 
 from apixdev.core.tools import dict_merge, nested_set
+
+_logger = logging.getLogger(__name__)
 
 
 class Compose:
@@ -43,8 +46,14 @@ class Compose:
         nested_set(vals, keys, value)
         dict_merge(self._content, vals)
 
+        print(self._content)
+
     def save(self, filepath):
         assert self._content, "No content to save."
+
+        if os.path.exists(filepath):
+            _logger.info("Remove '%s'", filepath)
+            os.remove(filepath)
 
         with open(filepath, mode="wb") as file:
             yaml.dump(self._content, file, encoding="utf-8")

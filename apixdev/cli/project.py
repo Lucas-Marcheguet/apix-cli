@@ -3,6 +3,7 @@ import sys
 import click
 
 from apixdev.cli.tools import abort_if_false, print_list
+from apixdev.core.exceptions import DownloadError, NoContainerFound
 from apixdev.core.odoo import Odoo
 from apixdev.core.project import Project
 
@@ -11,7 +12,10 @@ from apixdev.core.project import Project
 @click.argument("name")
 @click.option("--local", "-l", is_flag=True, help="Create blank project")
 def new(name, **kwargs):
-    """Create new project"""
+    """Create new project from online database.
+
+    NAME is the name of the database.
+    """
 
     is_local = kwargs.get("local", False)
     database = False
@@ -37,7 +41,7 @@ def new(name, **kwargs):
         for name, url in urls:
             try:
                 project.download(name, url)
-            except Exception as error:
+            except DownloadError as error:
                 click.echo(error)
                 sys.exit(1)
 
@@ -54,14 +58,19 @@ def new(name, **kwargs):
     prompt="Are you sure you want to overwrite project ?",
 )
 @click.argument("name")
-def update(name, **kwargs):
-    """Update project"""
+def update(name, help="update project"):
+    """Update the local project based on the manifest.
+
+    NAME is the name of the local project.
+
+    Note: Repositorie and requirements are updated.
+    """
 
     project = Project(name)
 
     if not project.is_ready:
         click.echo(f"No '{project}' project found locally.")
-        return False
+        sys.exit(1)
 
     project.load_manifest()
     project.pull_repositories()
@@ -70,35 +79,38 @@ def update(name, **kwargs):
 
 @click.command()
 @click.argument("name")
-def merge(name, **kwargs):
-    """Merge requirements"""
+def merge(name):
+    """Merge requirements from online manifest and local repositories.
+
+    NAME is the name of the local project.
+    """
 
     project = Project(name)
 
     if not project.is_ready:
         click.echo(f"No '{project}' project found locally.")
-        return False
+        sys.exit(1)
 
     project.merge_requirements()
 
 
 @click.command()
 @click.argument("name")
-def pull(name, **kwargs):
+def pull(name):
     """Pull repositories"""
 
     project = Project(name)
 
     if not project.is_ready:
         click.echo(f"No '{project}' project found locally.")
-        return False
+        sys.exit(1)
 
     project.pull_repositories()
 
 
 @click.command()
 @click.argument("name")
-def search(name, **kwargs):
+def search(name):
     """Search for online project"""
 
     odoo = Odoo.new()
@@ -117,7 +129,7 @@ def search(name, **kwargs):
     prompt="Are you sure you want to delete project ?",
 )
 @click.argument("name")
-def delete(name, **kwargs):
+def delete(name):
     """Delete local project"""
 
     project = Project(name)
@@ -125,9 +137,34 @@ def delete(name, **kwargs):
 
 
 @click.command()
-@click.option("--detach", "-d", is_flag=True, help="Run on background (detach)")
+@click.option("--detach", "-d", is_flag=True, help="Running on background (detach)")
+@click.option("--reload", "-r", is_flag=True, help="Dev mode (auto reload)")
 @click.argument("name")
 def run(name, **kwargs):
+    """Run project"""
+
+    run_on_background = kwargs.get("detach", False)
+    auto_reload = kwargs.get("reload", False)
+    project = Project(name)
+
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        sys.exit(1)
+
+    stack = project.get_stack()
+
+    if run_on_background:
+        stack.run(run_on_background, False)
+    else:
+        # Run on foreground means auto shutdown stack when user exit container
+        stack.run(run_on_background, auto_reload)
+        stack.stop()
+
+
+@click.command()
+@click.option("--detach", "-d", is_flag=True, help="Run on background (detach)")
+@click.argument("name")
+def restart(name, **kwargs):
     """Run project"""
 
     run_on_background = kwargs.get("detach", False)
@@ -135,9 +172,10 @@ def run(name, **kwargs):
 
     if not project.is_ready:
         click.echo(f"No '{project}' project found locally.")
-        return False
+        sys.exit(1)
 
     stack = project.get_stack()
+    stack.stop()
 
     if run_on_background:
         stack.run(run_on_background)
@@ -156,7 +194,7 @@ def stop(name):
 
     if not project.is_ready:
         click.echo(f"No '{project}' project found locally.")
-        return False
+        sys.exit(1)
 
     stack = project.get_stack()
     stack.stop()
@@ -171,31 +209,17 @@ def stop(name):
     prompt="Are you sure you want to clear project containers (databsae will be lost) ?",
 )
 @click.argument("name")
-def clear(name, **kwargs):
+def clear(name):
     """Clear project containers"""
 
     project = Project(name)
 
     if not project.is_ready:
         click.echo(f"No '{project}' project found locally.")
-        return False
+        sys.exit(1)
 
     stack = project.get_stack()
     stack.clear()
-
-
-# @click.command()
-# @click.argument("name")
-# def show(name):
-#     """Ps project containers"""
-
-#     project = Project(name)
-
-#     if not project.is_ready:
-#         click.echo(f"No '{project}' project found locally.")
-#         return False
-
-#     project.ps()
 
 
 @click.command()
@@ -208,12 +232,12 @@ def logs(name, service="odoo"):
 
     if not project.is_ready:
         click.echo(f"No '{project}' project found locally.")
-        return False
+        sys.exit(1)
 
     stack = project.get_stack()
     try:
         container = stack.get_container(service)
-    except Exception as error:
+    except NoContainerFound as error:
         click.echo(error)
         sys.exit(1)
     container.logs()
@@ -228,12 +252,12 @@ def bash(name, service="odoo"):
 
     if not project.is_ready:
         click.echo(f"No '{project}' project found locally.")
-        return False
+        sys.exit(1)
 
     stack = project.get_stack()
     try:
         container = stack.get_container(service)
-    except Exception as error:
+    except NoContainerFound as error:
         click.echo(error)
         sys.exit(1)
     container.bash()
@@ -249,7 +273,7 @@ def shell(name, database):
 
     if not project.is_ready:
         click.echo(f"No '{project}' project found locally.")
-        return False
+        sys.exit(1)
 
     stack = project.get_stack()
     container = stack.get_odoo_container()
@@ -267,7 +291,7 @@ def install_modules(name, database, modules):
 
     if not project.is_ready:
         click.echo(f"No '{project}' project found locally.")
-        return False
+        sys.exit(1)
 
     stack = project.get_stack()
     container = stack.get_odoo_container()
@@ -285,7 +309,7 @@ def update_modules(name, database, modules):
 
     if not project.is_ready:
         click.echo(f"No '{project}' project found locally.")
-        return False
+        sys.exit(1)
 
     stack = project.get_stack()
     container = stack.get_odoo_container()
@@ -301,8 +325,46 @@ def show(name):
 
     if not project.is_ready:
         click.echo(f"No '{project}' project found locally.")
-        return False
+        sys.exit(1)
 
     stack = project.get_stack()
     containers = stack.get_containers()
     print_list(containers)
+
+
+@click.command()
+@click.argument("name")
+def locate(name):
+    """Locate project on disk"""
+    project = Project(name)
+
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        sys.exit(1)
+
+    click.echo(project.repositories_path)
+    click.launch(project.repositories_path, locate=True)
+
+
+@click.command()
+@click.argument("name")
+def last_backup(name):
+    """Get last url backup for online project"""
+
+    project = Project(name)
+
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        sys.exit(1)
+
+    if not project.uuid:
+        project.load_manifest()
+
+    print(project.uuid)
+
+    odoo = Odoo.new()
+    url = odoo.get_last_backup_url(project.uuid)
+    print_list([url])
+
+    if url:
+        click.launch(url)
