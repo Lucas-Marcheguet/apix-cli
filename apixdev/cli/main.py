@@ -60,6 +60,7 @@ project.add_command(project_cmd.shell)
 project.add_command(project_cmd.install_modules)
 project.add_command(project_cmd.update_modules)
 project.add_command(project_cmd.last_backup)
+project.add_command(project_cmd.repo)
 
 projects.add_command(projects_cmd.ls)
 projects.add_command(projects_cmd.stop)

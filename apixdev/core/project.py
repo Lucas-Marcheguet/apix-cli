@@ -168,6 +168,18 @@ class Project:
 
         return Stack(self.name, self.path)
 
+    def get_repo(self):
+        """Return repositories and branches from YAML manifest."""
+
+        compose = Compose.from_path(self.repositories_file)
+
+        res = {
+            k.split("/")[-1]: v["merges"][0].split(" ")[-1]
+            for k, v in compose._content.items()
+        }
+
+        return res
+
     def delete(self):
         """Delete project and remove files."""
 

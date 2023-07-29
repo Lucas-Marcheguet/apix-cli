@@ -62,8 +62,6 @@ class Compose:
         nested_set(vals, keys, value)
         dict_merge(self._content, vals)
 
-        print(self._content)
-
     def save(self, filepath):
         """Save compose object to filepath."""
 

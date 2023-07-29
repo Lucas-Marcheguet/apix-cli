@@ -2,7 +2,7 @@ import sys
 
 import click
 
-from apixdev.cli.tools import abort_if_false, print_list
+from apixdev.cli.tools import abort_if_false, print_dict, print_list
 from apixdev.core.exceptions import DownloadError, NoContainerFound
 from apixdev.core.odoo import Odoo
 from apixdev.core.project import Project
@@ -422,3 +422,21 @@ def last_backup(name):
 
     if url:
         click.launch(url)
+
+
+@click.command()
+@click.argument("name")
+def repo(name):
+    """Get repositories list with branches.
+
+    `NAME` is the name of the local project.
+    """
+
+    project = Project(name)
+
+    if not project.is_ready:
+        click.echo(f"No '{project}' project found locally.")
+        sys.exit(1)
+
+    repositories = project.get_repo()
+    print_dict(repositories)
