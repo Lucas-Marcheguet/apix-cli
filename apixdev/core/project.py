@@ -26,14 +26,18 @@ class Project:
         self.path = path or os.path.join(self.root_path, name)
         self.name = name
         self.uuid = None
+        self.major_version = None
 
         os.makedirs(self.path, exist_ok=True)
+
+        if self.is_ready:
+            self.read_manifest()
 
     def __repr__(self) -> str:
         return f"Project({self.name})"
 
     def __str__(self) -> str:
-        return self.name
+        return f"{self.name} ({self.major_version})"
 
     @classmethod
     def from_path(cls, path):
@@ -84,6 +88,9 @@ class Project:
             self.manifest_file,
         ]
         return bool(all(map(os.path.exists, files)))
+
+    def _get_manifest(self):
+        return Compose.from_path(self.manifest_file)
 
     def download(self, filename, url, force=False):
         """Generic method to download file from ApiX database."""
@@ -148,11 +155,17 @@ class Project:
         compose.update("services/odoo/environment/CUSTOM_REQUIREMENTS", text)
         compose.save(self.compose_file)
 
+    def read_manifest(self):
+        """Read YAML manifest."""
+
+        manifest = self._get_manifest()
+        self.uuid = manifest.extract("uuid")
+        self.major_version = manifest.extract("major_version")
+
     def load_manifest(self):
         """Load YAML manifest and download files related."""
 
-        manifest = Compose.from_path(self.manifest_file)
-        self.uuid = manifest.extract("uuid")
+        manifest = self._get_manifest()
 
         keys = [
             (self.compose_file, "docker_compose_url"),

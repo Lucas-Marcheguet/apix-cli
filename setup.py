@@ -1,9 +1,11 @@
 from setuptools import find_packages, setup
 
 setup(
-    name="apixdev",
-    version="0.3.6",
+    name="apix-cli",
+    version="1.0.0",
     description="ApiX CLI",
+    long_description=open("README.md", encoding="utf-8").read(),
+    long_description_content_type="text/markdown",
     keywords="docker odoo development",
     url="https://github.com/apikcloud/apix-cli",
     author="Aurelien ROY",
@@ -26,6 +28,7 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
     packages=find_packages(),
     include_package_data=True,
